@@ -754,6 +754,8 @@ static OSStatus topRenderNotifyCallback(void *inRefCon, AudioUnitRenderActionFla
     return audioDescription;
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 + (AudioStreamBasicDescription)audioUnitCanonicalAudioDescription {
     AudioStreamBasicDescription audioDescription;
     memset(&audioDescription, 0, sizeof(audioDescription));
@@ -767,6 +769,7 @@ static OSStatus topRenderNotifyCallback(void *inRefCon, AudioUnitRenderActionFla
     audioDescription.mSampleRate        = 44100.0;
     return audioDescription;
 }
+#pragma clang diagnostic pop
 
 + (BOOL)voiceProcessingAvailable {
     // Determine platform name
@@ -1067,6 +1070,8 @@ static OSStatus topRenderNotifyCallback(void *inRefCon, AudioUnitRenderActionFla
     AEChannelRef removedChannels[count];
     memset(removedChannels, 0, sizeof(removedChannels));
     AEChannelRef *removedChannels_p = removedChannels;
+
+    NSAssert(group != nil, @"AEChannelGroupRef should not be nil");
     int priorCount = group->channelCount;
     [self performSynchronousMessageExchangeWithBlock:^{
         removeChannelsFromGroup(self, group, ptrMatchArray, objectMatchArray, removedChannels_p, count);

@@ -248,7 +248,7 @@ static UInt32 _TPCircularBufferPeek_iOS5(TPCircularBuffer_iOS5 *buffer, AudioTim
         TPCircularBufferABLBlockHeader_iOS5 *nextBlock = (TPCircularBufferABLBlockHeader_iOS5*)((char*)block + block->totalLength);
         if ( (void*)nextBlock >= end ||
                 (contiguousToleranceSampleTime != UINT32_MAX
-                    && labs(nextBlock->timestamp.mSampleTime - (block->timestamp.mSampleTime + (block->bufferList.mBuffers[0].mDataByteSize / audioFormat->mBytesPerFrame))) > contiguousToleranceSampleTime) ) {
+                    && fabs(nextBlock->timestamp.mSampleTime - (block->timestamp.mSampleTime + (block->bufferList.mBuffers[0].mDataByteSize / audioFormat->mBytesPerFrame))) > contiguousToleranceSampleTime) ) {
             break;
         }
         assert(!((unsigned long)nextBlock & 0xF) /* Beware unaligned accesses */);

@@ -123,6 +123,7 @@ static OSStatus complexInputDataProc(AudioConverterRef             inAudioConver
     [self updateFormats];
 }
 
+#ifndef __clang_analyzer__
 BOOL AEFloatConverterToFloat_iOS5(__unsafe_unretained AEFloatConverter_iOS5* THIS, AudioBufferList *sourceBuffer, float * const * targetBuffers, UInt32 frames) {
     if ( frames == 0 ) return YES;
     
@@ -136,14 +137,12 @@ BOOL AEFloatConverterToFloat_iOS5(__unsafe_unretained AEFloatConverter_iOS5* THI
             THIS->_scratchFloatBufferList->mBuffers[i].mData = targetBuffers[i];
             THIS->_scratchFloatBufferList->mBuffers[i].mDataByteSize = frames * sizeof(float);
         }
-        
         OSStatus result = AudioConverterFillComplexBuffer(THIS->_toFloatConverter,
                                                           complexInputDataProc,
                                                           &(struct complexInputDataProc_t) { .sourceBuffer = sourceBuffer },
                                                           &frames,
                                                           THIS->_scratchFloatBufferList,
                                                           NULL);
-        
         for ( int i=0; i<sourceBuffer->mNumberBuffers; i++ ) {
             sourceBuffer->mBuffers[i].mDataByteSize = priorDataByteSize;
         }
@@ -160,6 +159,7 @@ BOOL AEFloatConverterToFloat_iOS5(__unsafe_unretained AEFloatConverter_iOS5* THI
     
     return YES;
 }
+#endif
 
 BOOL AEFloatConverterToFloatBufferList_iOS5(__unsafe_unretained AEFloatConverter_iOS5* THIS, AudioBufferList *sourceBuffer, AudioBufferList *targetBuffer, UInt32 frames) {
     assert(targetBuffer->mNumberBuffers == THIS->_floatAudioDescription.mChannelsPerFrame);
@@ -171,6 +171,7 @@ BOOL AEFloatConverterToFloatBufferList_iOS5(__unsafe_unretained AEFloatConverter
     return AEFloatConverterToFloat_iOS5(THIS, sourceBuffer, targetBuffers, frames);
 }
 
+#ifndef __clang_analyzer__
 BOOL AEFloatConverterFromFloat(__unsafe_unretained AEFloatConverter_iOS5* THIS, float * const * sourceBuffers, AudioBufferList *targetBuffer, UInt32 frames) {
     if ( frames == 0 ) return YES;
     
@@ -207,6 +208,7 @@ BOOL AEFloatConverterFromFloat(__unsafe_unretained AEFloatConverter_iOS5* THIS, 
     
     return YES;
 }
+#endif
 
 BOOL AEFloatConverterFromFloatBufferList(__unsafe_unretained AEFloatConverter_iOS5* THIS, AudioBufferList *sourceBuffer, AudioBufferList *targetBuffer, UInt32 frames) {
     assert(sourceBuffer->mNumberBuffers == THIS->_floatAudioDescription.mChannelsPerFrame);
