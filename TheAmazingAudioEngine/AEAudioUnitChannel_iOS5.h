@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 #import <Foundation/Foundation.h>
-#import "TheAmazingAudioEngine.h"
+#import "TheAmazingAudioEngine_iOS5.h"
 
 /*!
  * Audio Unit Channel
@@ -38,7 +38,7 @@ extern "C" {
  *  corresponding audio unit will be initialised, ready for use
  *
  */
-@interface AEAudioUnitChannel : NSObject <AEAudioPlayable>
+@interface AEAudioUnitChannel_iOS5 : NSObject <AEAudioPlayable>
 
 /*!
  * Create a new Audio Unit channel
@@ -49,7 +49,7 @@ extern "C" {
  * @return The initialised channel
  */
 - (id)initWithComponentDescription:(AudioComponentDescription)audioComponentDescription
-                   audioController:(AEAudioController*)audioController
+                   audioController:(AEAudioController_iOS5*)audioController
                              error:(NSError**)error;
 
 /*!
@@ -63,7 +63,7 @@ extern "C" {
  * @return The initialised channel
  */
 - (id)initWithComponentDescription:(AudioComponentDescription)audioComponentDescription
-                   audioController:(AEAudioController*)audioController
+                   audioController:(AEAudioController_iOS5*)audioController
                 preInitializeBlock:(void(^)(AudioUnit audioUnit))block
                              error:(NSError**)error;
 

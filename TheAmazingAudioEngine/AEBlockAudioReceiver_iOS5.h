@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 #import <Foundation/Foundation.h>
-#import "TheAmazingAudioEngine.h"
+#import "TheAmazingAudioEngine_iOS5.h"
 
 typedef void (^AEBlockAudioReceiverBlock)(void                     *source,
                                           const AudioTimeStamp     *time,
@@ -38,14 +38,14 @@ typedef void (^AEBlockAudioReceiverBlock)(void                     *source,
 /*!
  * Block audio receiver: Utility class to allow use of a block to receive audio
  */
-@interface AEBlockAudioReceiver : NSObject <AEAudioReceiver>
+@interface AEBlockAudioReceiver_iOS5 : NSObject <AEAudioReceiver>
 
 /*!
  * Create a new audio receiver with a given block
  *
  * @param block Block to use for audio generation
  */
-+ (AEBlockAudioReceiver*)audioReceiverWithBlock:(AEBlockAudioReceiverBlock)block;
++ (AEBlockAudioReceiver_iOS5*)audioReceiverWithBlock:(AEBlockAudioReceiverBlock)block;
 
 @end
 

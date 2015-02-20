@@ -39,9 +39,9 @@ extern NSString * kAERecorderErrorKey;
  *  This can be used to record just the microphone input, or the output of the
  *  audio system, just one channel, or a combination of all three. Simply add an
  *  instance of this class as an audio receiver for the particular audio you wish
- *  to record, using AEAudioController's [addInputReceiver:](@ref AEAudioController::addInputReceiver:),
- *  [addOutputReceiver:](@ref AEAudioController::addOutputReceiver:),
- *  [addOutputReceiver:forChannel:](@ref AEAudioController::addOutputReceiver:forChannel:), etc, and all 
+ *  to record, using AEAudioController_iOS5's [addInputReceiver:](@ref AEAudioController_iOS5::addInputReceiver:),
+ *  [addOutputReceiver:](@ref AEAudioController_iOS5::addOutputReceiver:),
+ *  [addOutputReceiver:forChannel:](@ref AEAudioController_iOS5::addOutputReceiver:forChannel:), etc, and all 
  *  streams will be mixed together and recorded.
  *
  *  See the sample app for a demonstration.
@@ -58,7 +58,7 @@ extern NSString * kAERecorderErrorKey;
  *
  * @param audioController The Audio Controller
  */
-- (id)initWithAudioController:(AEAudioController*)audioController;
+- (id)initWithAudioController:(AEAudioController_iOS5*)audioController;
 
 /*!
  * Prepare and begin recording

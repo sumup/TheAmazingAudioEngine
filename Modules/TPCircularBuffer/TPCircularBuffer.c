@@ -40,7 +40,7 @@ static inline bool _reportResult(kern_return_t result, const char *operation, co
     return true;
 }
 
-bool TPCircularBufferInit(TPCircularBuffer *buffer, int length) {
+bool TPCircularBufferInit_iOS5(TPCircularBuffer_iOS5 *buffer, int length) {
 
     // Keep trying until we get our buffer, needed to handle race conditions
     int retries = 3;
@@ -123,14 +123,14 @@ bool TPCircularBufferInit(TPCircularBuffer *buffer, int length) {
     return false;
 }
 
-void TPCircularBufferCleanup(TPCircularBuffer *buffer) {
+void TPCircularBufferCleanup_iOS5(TPCircularBuffer_iOS5 *buffer) {
     vm_deallocate(mach_task_self(), (vm_address_t)buffer->buffer, buffer->length * 2);
     memset(buffer, 0, sizeof(TPCircularBuffer));
 }
 
-void TPCircularBufferClear(TPCircularBuffer *buffer) {
+void TPCircularBufferClear_iOS5(TPCircularBuffer_iOS5 *buffer) {
     int32_t fillCount;
-    if ( TPCircularBufferTail(buffer, &fillCount) ) {
-        TPCircularBufferConsume(buffer, fillCount);
+    if ( TPCircularBufferTail_iOS5(buffer, &fillCount) ) {
+        TPCircularBufferConsume_iOS5(buffer, fillCount);
     }
 }

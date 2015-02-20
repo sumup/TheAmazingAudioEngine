@@ -31,16 +31,16 @@ extern "C" {
 
 #import "AEAudioController.h"
 #import "AEAudioController+Audiobus.h"
-#import "AEAudioFileLoaderOperation.h"
+#import "AEAudioFileLoaderOperation_iOS5.h"
 #import "AEAudioFilePlayer.h"
-#import "AEAudioFileWriter.h"
-#import "AEBlockChannel.h"
-#import "AEBlockFilter.h"
-#import "AEBlockAudioReceiver.h"
-#import "AEAudioUnitChannel.h"
-#import "AEAudioUnitFilter.h"
-#import "AEFloatConverter.h"
-#import "AEBlockScheduler.h"
+#import "AEAudioFileWriter_iOS5.h"
+#import "AEBlockChannel_iOS5.h"
+#import "AEBlockFilter_iOS5.h"
+#import "AEBlockAudioReceiver_iOS5.h"
+#import "AEAudioUnitChannel_iOS5.h"
+#import "AEAudioUnitFilter_iOS5.h"
+#import "AEFloatConverter_iOS5.h"
+#import "AEBlockScheduler_iOS5.h"
 #import "AEUtilities.h"
 
 /*!
@@ -120,24 +120,24 @@ extern "C" {
  "Build Phases" tab of your app target, opening the "Compile Sources" section, and double-clicking in the
  "Compiler Flags" column of the relevant source files.
  
- @section Meet-AEAudioController Meet AEAudioController
+ @section Meet-AEAudioController_iOS5 Meet AEAudioController_iOS5
  
- The main hub of The Amazing Audio Engine is AEAudioController. This class contains the main audio engine, and manages
+ The main hub of The Amazing Audio Engine is AEAudioController_iOS5. This class contains the main audio engine, and manages
  your audio session for you.
  
- To begin, create a new instance of AEAudioController in an appropriate location, such as within your app delegate:
+ To begin, create a new instance of AEAudioController_iOS5 in an appropriate location, such as within your app delegate:
  
  @code
- @property (nonatomic, strong) AEAudioController *audioController;
+ @property (nonatomic, strong) AEAudioController_iOS5 *audioController;
  
  ...
  
- self.audioController = [[AEAudioController alloc]
-                            initWithAudioDescription:[AEAudioController nonInterleaved16BitStereoAudioDescription]
+ self.audioController = [[AEAudioController_iOS5 alloc]
+                            initWithAudioDescription:[AEAudioController_iOS5 nonInterleaved16BitStereoAudioDescription]
                                 inputEnabled:YES]; // don't forget to autorelease if you don't use ARC!
  @endcode
  
- Here, you pass in the audio format you wish to use within your app. AEAudioController offers some easy-to-use predefined
+ Here, you pass in the audio format you wish to use within your app. AEAudioController_iOS5 offers some easy-to-use predefined
  formats, but you can use anything that the underlying Core Audio system supports.
  
  You can also enable audio input, if you choose.
@@ -154,7 +154,7 @@ extern "C" {
  }
  @endcode
  
- Take a look at the documentation for AEAudioController to see the available properties that can be set to modify
+ Take a look at the documentation for AEAudioController_iOS5 to see the available properties that can be set to modify
  behaviour, such as preferred buffer duration, audio input mode, audio category session to use. You can set these at any time.
  
  Now that you've got a running audio engine, it's time to [create some audio](@ref Creating-Audio).
@@ -214,7 +214,7 @@ extern "C" {
  classes that can act as channels.
  
  The protocol requires that you define a method that returns a pointer to a C function that takes the form
- defined by AEAudioControllerRenderCallback. This C function will be called when audio is required.
+ defined by AEAudioController_iOS5RenderCallback. This C function will be called when audio is required.
  
  <blockquote class="tip">
  If you put this C function within the \@implementation block, you will be able to access instance
@@ -232,7 +232,7 @@ extern "C" {
  ...
  
  static OSStatus renderCallback(AEAudioFilePlayer *THIS,
-                                AEAudioController *audioController,
+                                AEAudioController_iOS5 *audioController,
                                 const AudioTimeStamp *time,
                                 UInt32 frames,
                                 AudioBufferList *audio) {
@@ -240,7 +240,7 @@ extern "C" {
      return noErr;
  }
  
- -(AEAudioControllerRenderCallback)renderCallback {
+ -(AEAudioController_iOS5RenderCallback)renderCallback {
      return &renderCallback;
  }
  
@@ -258,7 +258,7 @@ extern "C" {
  
  To use it, call @link AEAudioUnitChannel::initWithComponentDescription:audioController:error: initWithComponentDescription:audioController:error: @endlink,
  passing in an `AudioComponentDescription` structure (you can use the utility function @link AEAudioComponentDescriptionMake @endlink for this),
- along with a reference to the AEAudioController instance, and optionally, a pointer to an NSError to be filled if the audio unit
+ along with a reference to the AEAudioController_iOS5 instance, and optionally, a pointer to an NSError to be filled if the audio unit
  creation failed.
  
  @code
@@ -282,14 +282,14 @@ extern "C" {
  
  @section Adding-Channels Adding Channels
  
- Once you've created a channel, you add it to the audio engine with [addChannels:](@ref AEAudioController::addChannels:).
+ Once you've created a channel, you add it to the audio engine with [addChannels:](@ref AEAudioController_iOS5::addChannels:).
  
  @code
  [_audioController addChannels:[NSArray arrayWithObject:_channel]];
  @endcode
  
  Note that you can use as many channels as the device can handle, and you can add/remove channels whenever you like, by
- calling [addChannels:](@ref AEAudioController::addChannels:) or [removeChannels:](@ref AEAudioController::removeChannels:).
+ calling [addChannels:](@ref AEAudioController_iOS5::addChannels:) or [removeChannels:](@ref AEAudioController_iOS5::removeChannels:).
  
  @section Grouping-Channels Grouping Channels
  
@@ -298,12 +298,12 @@ extern "C" {
  
  <img src="groups.png" alt="Channel groups">
  
- Create channel groups by calling [createChannelGroup](@ref AEAudioController::createChannelGroup) or create subgroups with
- [createChannelGroupWithinChannelGroup:](@ref AEAudioController::createChannelGroupWithinChannelGroup:), then add channels
- to these groups by calling [addChannels:toChannelGroup:](@ref AEAudioController::addChannels:toChannelGroup:).
+ Create channel groups by calling [createChannelGroup](@ref AEAudioController_iOS5::createChannelGroup) or create subgroups with
+ [createChannelGroupWithinChannelGroup:](@ref AEAudioController_iOS5::createChannelGroupWithinChannelGroup:), then add channels
+ to these groups by calling [addChannels:toChannelGroup:](@ref AEAudioController_iOS5::addChannels:toChannelGroup:).
  
- You can then perform a variety of operations on the channel groups, such as @link AEAudioController::setVolume:forChannelGroup: setting volume @endlink
- and @link AEAudioController::setPan:forChannelGroup: pan @endlink, and adding filters and audio receivers, which we shall cover next.
+ You can then perform a variety of operations on the channel groups, such as @link AEAudioController_iOS5::setVolume:forChannelGroup: setting volume @endlink
+ and @link AEAudioController_iOS5::setPan:forChannelGroup: pan @endlink, and adding filters and audio receivers, which we shall cover next.
  
  -----------
  
@@ -330,7 +330,7 @@ extern "C" {
  opaque `producerToken` pointer also passed to the block.
  
 @code
-self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer producer,
+self.filter = [AEBlockFilter filterWithBlock:^(AEAudioController_iOS5FilterProducer producer,
                                                void                     *producerToken,
                                                const AudioTimeStamp     *time,
                                                UInt32                    frames,
@@ -349,7 +349,7 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  classes that can filter audio.
  
  The protocol requires that you define a method that returns a pointer to a C function that takes the form
- defined by AEAudioControllerFilterCallback. This C function will be called when audio is to be filtered.
+ defined by AEAudioController_iOS5FilterCallback. This C function will be called when audio is to be filtered.
  
  <blockquote class="tip">
  If you put this C function within the \@implementation block, you will be able to access instance
@@ -371,8 +371,8 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  ...
  
  static OSStatus filterCallback(id                        filter,
-                                AEAudioController        *audioController,
-                                AEAudioControllerFilterProducer producer,
+                                AEAudioController_iOS5        *audioController,
+                                AEAudioController_iOS5FilterProducer producer,
                                 void                     *producerToken,
                                 const AudioTimeStamp     *time,
                                 UInt32                    frames,
@@ -389,7 +389,7 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
      return noErr;
  }
 
- -(AEAudioControllerFilterCallback)filterCallback {
+ -(AEAudioController_iOS5FilterCallback)filterCallback {
      return filterCallback;
  }
  
@@ -406,7 +406,7 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  
  To use it, call @link AEAudioUnitFilter::initWithComponentDescription:audioController:error: initWithComponentDescription:audioController:error: @endlink,
  passing in an `AudioComponentDescription` structure (you can use the utility function @link AEAudioComponentDescriptionMake @endlink for this),
- along with a reference to the AEAudioController instance, and optionally, a pointer to an NSError to be filled if the audio unit
+ along with a reference to the AEAudioController_iOS5 instance, and optionally, a pointer to an NSError to be filled if the audio unit
  creation failed.
  
  @code
@@ -441,13 +441,13 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  
  Once you've got a filter, you can apply it to a variety of different audio sources:
  
- - Apply it to your entire app's output using @link AEAudioController::addFilter: addFilter: @endlink.
- - Apply it to an individual channel using @link AEAudioController::addFilter:toChannel: addFilter:toChannel: @endlink.
- - Apply it to a [channel group](@ref Grouping-Channels) using @link AEAudioController::addFilter:toChannelGroup: addFilter:toChannelGroup: @endlink.
- - Apply it to your app's audio input using @link AEAudioController::addInputFilter: addInputFilter: @endlink.
+ - Apply it to your entire app's output using @link AEAudioController_iOS5::addFilter: addFilter: @endlink.
+ - Apply it to an individual channel using @link AEAudioController_iOS5::addFilter:toChannel: addFilter:toChannel: @endlink.
+ - Apply it to a [channel group](@ref Grouping-Channels) using @link AEAudioController_iOS5::addFilter:toChannelGroup: addFilter:toChannelGroup: @endlink.
+ - Apply it to your app's audio input using @link AEAudioController_iOS5::addInputFilter: addInputFilter: @endlink.
  
- You can add and remove filters at any time, using @link AEAudioController::addFilter: addFilter: @endlink and 
- @link AEAudioController::removeFilter: removeFilter: @endlink, and the other channel, group and input equivalents.
+ You can add and remove filters at any time, using @link AEAudioController_iOS5::addFilter: addFilter: @endlink and 
+ @link AEAudioController_iOS5::removeFilter: removeFilter: @endlink, and the other channel, group and input equivalents.
 
  ------------
  
@@ -473,7 +473,7 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  @end
  @implementation MyAudioReceiver
  static void receiverCallback(id                        receiver,
-                              AEAudioController        *audioController,
+                              AEAudioController_iOS5        *audioController,
                               void                     *source,
                               const AudioTimeStamp     *time,
                               UInt32                    frames,
@@ -483,7 +483,7 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
      // Do something with 'audio'
  }
  
- -(AEAudioControllerAudioCallback)receiverCallback {
+ -(AEAudioController_iOS5AudioCallback)receiverCallback {
      return receiverCallback;
  }
  @end
@@ -507,10 +507,10 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  
  Then, add the receiver to the source of your choice:
  
- - To receive audio input, use @link AEAudioController::addInputReceiver: addInputReceiver: @endlink.
- - To receive audio output, use @link AEAudioController::addOutputReceiver: addOutputReceiver: @endlink.
- - To receive audio from a channel, use @link AEAudioController::addOutputReceiver:forChannel: addOutputReceiver:forChannel: @endlink.
- - To receive audio from a channel group, use @link AEAudioController::addOutputReceiver:forChannelGroup: addOutputReceiver:forChannelGroup: @endlink.
+ - To receive audio input, use @link AEAudioController_iOS5::addInputReceiver: addInputReceiver: @endlink.
+ - To receive audio output, use @link AEAudioController_iOS5::addOutputReceiver: addOutputReceiver: @endlink.
+ - To receive audio from a channel, use @link AEAudioController_iOS5::addOutputReceiver:forChannel: addOutputReceiver:forChannel: @endlink.
+ - To receive audio from a channel group, use @link AEAudioController_iOS5::addOutputReceiver:forChannelGroup: addOutputReceiver:forChannelGroup: @endlink.
  
  @section Playthrough Playthrough/Audio Monitoring
  
@@ -522,8 +522,8 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  audio receiver and an audio source.
  
  To use it, initialize it using @link AEPlaythroughChannel::initWithAudioController: initWithAudioController: @endlink,
- then add it as an input receiver using AEAudioController's @link AEAudioController::addInputReceiver: addInputReceiver: @endlink
- and add it as a channel using @link AEAudioController::addChannels: addChannels: @endlink.
+ then add it as an input receiver using AEAudioController_iOS5's @link AEAudioController_iOS5::addInputReceiver: addInputReceiver: @endlink
+ and add it as a channel using @link AEAudioController_iOS5::addChannels: addChannels: @endlink.
  
  @section Recording Recording
  
@@ -587,8 +587,8 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  The Amazing Audio Engine provides the ability to select a set of input channels when a multi-channel input
  device is connected.
  
- You can assign an array of NSIntegers to the [inputChannelSelection](@ref AEAudioController::inputChannelSelection) property
- of AEAudioController in order to select which channels of the input device should be used.
+ You can assign an array of NSIntegers to the [inputChannelSelection](@ref AEAudioController_iOS5::inputChannelSelection) property
+ of AEAudioController_iOS5 in order to select which channels of the input device should be used.
  
  For example, for a four-channel input device, the following will select the last two channels as a stereo stream:
  
@@ -603,8 +603,8 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  have one AEAudioReceiver object receiving from the first channel of a stereo input device, and a different
  object receiving from the second channel.
  
- Use the @link AEAudioController::addInputReceiver:forChannels: addInputReceiver:forChannels: @endlink and
- @link AEAudioController::addInputFilter:forChannels: addInputFilter:forChannels: @endlink methods to do this:
+ Use the @link AEAudioController_iOS5::addInputReceiver:forChannels: addInputReceiver:forChannels: @endlink and
+ @link AEAudioController_iOS5::addInputFilter:forChannels: addInputFilter:forChannels: @endlink methods to do this:
  
  @code
  [_audioController addInputReceiver:
@@ -626,7 +626,7 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
                         forChannels:[NSArray arrayWithObject:[NSNumber numberWithInt:1]]];
  @endcode
  
- Note that the [numberOfInputChannels](@ref AEAudioController::numberOfInputChannels) property is key-value observable,
+ Note that the [numberOfInputChannels](@ref AEAudioController_iOS5::numberOfInputChannels) property is key-value observable,
  so you can use this to be notified when to display appopriate UI, etc.
  
  ----------
@@ -643,7 +643,7 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  receive or process audio.
  
  The Amazing Audio Engine, developed by Michael Tyson, the same developer who created Audiobus, contains a
- @link AEAudioController(AudiobusAdditions) deep integration @endlink of Audiobus, with support for:
+ @link AEAudioController_iOS5(AudiobusAdditions) deep integration @endlink of Audiobus, with support for:
  
  - Receiving Audiobus audio that seamlessly replaces microphone/device audio input.
  - Sending Audiobus audio from any point in your app: The primary app output, or any channel or channel group.
@@ -657,13 +657,13 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  Then you can:
  
  - Receive Audiobus audio by creating an Audiobus Sender port and passing it to The Amazing Audio Engine
-   via AEAudioController's [audiobusReceiverPort](@ref AEAudioController::audiobusReceiverPort).
+   via AEAudioController_iOS5's [audiobusReceiverPort](@ref AEAudioController_iOS5::audiobusReceiverPort).
  - Send your app's audio output via Audiobus by creating a sender port and assigning it to 
-   audiobusSenderPort](@ref AEAudioController::audiobusSenderPort).
+   audiobusSenderPort](@ref AEAudioController_iOS5::audiobusSenderPort).
  - Send one individual channel via Audiobus by assigning a new Sender port via
-   @link AEAudioController::setAudiobusSenderPort:forChannel: setAudiobusSenderPort:forChannel: @endlink
+   @link AEAudioController_iOS5::setAudiobusSenderPort:forChannel: setAudiobusSenderPort:forChannel: @endlink
  - Send a channel group via Audiobus by assigning a new Sender port via
-   @link AEAudioController::setAudiobusSenderPort:forChannelGroup: setAudiobusSenderPort:forChannelGroup: @endlink
+   @link AEAudioController_iOS5::setAudiobusSenderPort:forChannelGroup: setAudiobusSenderPort:forChannelGroup: @endlink
 
  <blockquote>
  Audiobus provides an `ABAudiobusAudioUnitWrapper` class that makes working with audio units easier. <strong>The
@@ -787,7 +787,7 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  static const int kScratchBufferSize[4096];
  
  AudioBufferList *scratchBufferList
-    = AEAllocateAndInitAudioBufferList([AEAudioController nonInterleavedFloatStereoAudioDescription], 
+    = AEAllocateAndInitAudioBufferList([AEAudioController_iOS5 nonInterleavedFloatStereoAudioDescription], 
                                        kScratchBufferSize);
 
  
@@ -818,8 +818,8 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  required.
  
  To send a message to the Core Audio thread, use either
- @link AEAudioController::performAsynchronousMessageExchangeWithBlock:responseBlock: performAsynchronousMessageExchangeWithBlock:responseBlock: @endlink,
- or @link AEAudioController::performSynchronousMessageExchangeWithBlock: performSynchronousMessageExchangeWithBlock: @endlink:
+ @link AEAudioController_iOS5::performAsynchronousMessageExchangeWithBlock:responseBlock: performAsynchronousMessageExchangeWithBlock:responseBlock: @endlink,
+ or @link AEAudioController_iOS5::performSynchronousMessageExchangeWithBlock: performSynchronousMessageExchangeWithBlock: @endlink:
  
  @code
  [_audioController performAsynchronousMessageExchangeWithBlock:^{
@@ -839,13 +839,13 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  @endcode
  
  To send messages from the Core Audio thread back to the main thread, you need to
- define a C callback, which takes the form defined by @link AEAudioControllerMainThreadMessageHandler @endlink,
- then call @link AEAudioController::AEAudioControllerSendAsynchronousMessageToMainThread AEAudioControllerSendAsynchronousMessageToMainThread @endlink, passing a reference to
+ define a C callback, which takes the form defined by @link AEAudioController_iOS5MainThreadMessageHandler @endlink,
+ then call @link AEAudioController_iOS5::AEAudioController_iOS5SendAsynchronousMessageToMainThread AEAudioController_iOS5SendAsynchronousMessageToMainThread @endlink, passing a reference to
  any parameters, with the length of the parameters in bytes.
  
  @code
  struct _myHandler_arg_t { int arg1; int arg2; };
- static void myHandler(AEAudioController *audioController, void *userInfo, int userInfoLength) {
+ static void myHandler(AEAudioController_iOS5 *audioController, void *userInfo, int userInfoLength) {
     struct _myHandler_arg_t *arg = (struct _myHandler_arg_t*)userInfo;
     NSLog(@"On main thread; args are %d and %d", arg->arg1, arg->arg2);
  }
@@ -853,7 +853,7 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  ...
  
  // From Core Audio thread
- AEAudioControllerSendAsynchronousMessageToMainThread(THIS->_audioController,
+ AEAudioController_iOS5SendAsynchronousMessageToMainThread(THIS->_audioController,
                                                       myHandler,
                                                       &(struct _myHandler_arg_t) {
                                                         .arg1 = 1,
@@ -862,7 +862,7 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  @endcode
  
  Whatever is passed via the 'userInfo' parameter of
- @link AEAudioController::AEAudioControllerSendAsynchronousMessageToMainThread AEAudioControllerSendAsynchronousMessageToMainThread @endlink will be copied
+ @link AEAudioController_iOS5::AEAudioController_iOS5SendAsynchronousMessageToMainThread AEAudioController_iOS5SendAsynchronousMessageToMainThread @endlink will be copied
  onto an internal buffer. A pointer to the copied item on the internal buffer will be passed to the
  callback you provide.
  
@@ -872,7 +872,7 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  This:
  
  @code
- AEAudioControllerSendAsynchronousMessageToMainThread(THIS->_audioController,
+ AEAudioController_iOS5SendAsynchronousMessageToMainThread(THIS->_audioController,
                                                       myHandler,
                                                       &THIS,
                                                       sizeof(id) },
@@ -881,7 +881,7 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  Not this:
 
  @code
- AEAudioControllerSendAsynchronousMessageToMainThread(THIS->_audioController,
+ AEAudioController_iOS5SendAsynchronousMessageToMainThread(THIS->_audioController,
                                                       myHandler,
                                                       THIS,
                                                       sizeof(id) },
@@ -898,7 +898,7 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  timing and synchronization.
  
  In that case, you can implement the @link AEAudioTimingReceiver @endlink protocol and add your class as a timing receiver
- via [addTimingReceiver:](@ref AEAudioController::addTimingReceiver:).  The callback you provide will be called from
+ via [addTimingReceiver:](@ref AEAudioController_iOS5::addTimingReceiver:).  The callback you provide will be called from
  two contexts: When input is received (@link AEAudioTimingContextInput @endlink), and when output is about to be
  generated (@link AEAudioTimingContextOutput @endlink). In both cases, the timing receivers will be notified before
  any of the audio receivers or channels are invoked, so that you can set app state that will affect the current time interval.
@@ -909,7 +909,7 @@ self.filter = [AEBlockFilter filterWithBlock:^(AEAudioControllerFilterProducer p
  @link AEAudioTimingReceiver @endlink protocol, and provides an interface for scheduling blocks with sample-level
  accuracy.
  
- To use it, instantiate AEBlockScheduler, add it as a timing receiver with [addTimingReceiver:](@ref AEAudioController::addTimingReceiver:),
+ To use it, instantiate AEBlockScheduler, add it as a timing receiver with [addTimingReceiver:](@ref AEAudioController_iOS5::addTimingReceiver:),
  then begin scheduling events using
  @link AEBlockScheduler::scheduleBlock:atTime:timingContext:identifier: scheduleBlock:atTime:timingContext:identifier: @endlink:
  

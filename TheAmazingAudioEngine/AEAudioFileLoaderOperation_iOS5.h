@@ -30,7 +30,7 @@ extern "C" {
 #import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>
 
-@class AEAudioFileLoaderOperation;
+@class AEAudioFileLoaderOperation_iOS5;
 
 /*!
  * Audio file loader operation
@@ -63,7 +63,7 @@ extern "C" {
  *  Note that this class is not suitable for use with large audio files, 
  *  which should be loaded incrementally as playback occurs.
  */
-@interface AEAudioFileLoaderOperation : NSOperation
+@interface AEAudioFileLoaderOperation_iOS5 : NSOperation
 
 /*!
  * Get info for a file

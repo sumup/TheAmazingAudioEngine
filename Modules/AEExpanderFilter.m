@@ -68,7 +68,7 @@ typedef void (^AECalibrateCompletionBlock)(void);
 
 @property (nonatomic, copy) AECalibrateCompletionBlock calibrateCompletionBlock;
 @property (nonatomic, retain) AEFloatConverter *floatConverter;
-@property (nonatomic, assign) AEAudioController *audioController;
+@property (nonatomic, assign) AEAudioController_iOS5 *audioController;
 @end
 
 @implementation AEExpanderFilter
@@ -82,7 +82,7 @@ typedef void (^AECalibrateCompletionBlock)(void);
     __secondsToHostTicks = 1.0 / __hostTicksToSeconds;
 }
 
-- (id)initWithAudioController:(AEAudioController *)audioController {
+- (id)initWithAudioController:(AEAudioController_iOS5 *)audioController {
     if ( !(self = [super init]) ) return nil;
     
     self.audioController = audioController;
@@ -224,7 +224,7 @@ typedef void (^AECalibrateCompletionBlock)(void);
     return _hysteresis_db;
 }
 
-static void completeCalibration(AEAudioController *audioController, void *userInfo, int len) {
+static void completeCalibration(AEAudioController_iOS5 *audioController, void *userInfo, int len) {
     AEExpanderFilter *THIS = *(AEExpanderFilter**)userInfo;
     THIS->_threshold = min((THIS->_calibrationMaxValue + kCalibrationThresholdOffset),
                            ratio_from_db(kMaxAutoThreshold) * INT16_MAX) * THIS->_thresholdOffset;
@@ -237,8 +237,8 @@ static void completeCalibration(AEAudioController *audioController, void *userIn
 }
 
 static OSStatus filterCallback(id                        filter,
-                               AEAudioController        *audioController,
-                               AEAudioControllerFilterProducer producer,
+                               AEAudioController_iOS5        *audioController,
+                               AEAudioController_iOS5FilterProducer producer,
                                void                     *producerToken,
                                const AudioTimeStamp     *time,
                                UInt32                    frames,
@@ -265,7 +265,7 @@ static OSStatus filterCallback(id                        filter,
         
         if ( mach_absolute_time()-THIS->_calibrationStartTime >= kCalibrationTime*__secondsToHostTicks ) {
             THIS->_calibrationStartTime = 0;
-            AEAudioControllerSendAsynchronousMessageToMainThread(audioController, completeCalibration, &THIS, sizeof(AEExpanderFilter*));
+            AEAudioController_iOS5SendAsynchronousMessageToMainThread(audioController, completeCalibration, &THIS, sizeof(AEExpanderFilter*));
             return noErr;
         }
     }
@@ -300,7 +300,7 @@ static OSStatus filterCallback(id                        filter,
             
         case kStateClosing: {
             // Apply a ramp to the first part of the buffer
-            UInt32 decayFrames = AEConvertSecondsToFrames(audioController, THIS->_decay);
+            UInt32 decayFrames = AEConvertSecondsToFrames_iOS5(audioController, THIS->_decay);
             int rampDuration = min(THIS->_multiplier * decayFrames, frames);
             float multiplierStart = (THIS->_multiplier * (1.0-THIS->_ratio)) + THIS->_ratio;
             float multiplierStep = -(1.0 / decayFrames) * (1.0-THIS->_ratio);
@@ -330,7 +330,7 @@ static OSStatus filterCallback(id                        filter,
             
         case kStateOpening: {
             // Apply a ramp to the first part of the buffer
-            UInt32 attackFrames = AEConvertSecondsToFrames(audioController, THIS->_attack);
+            UInt32 attackFrames = AEConvertSecondsToFrames_iOS5(audioController, THIS->_attack);
             int rampDuration = min((1.0-THIS->_multiplier) * attackFrames, frames);
             float multiplierStart = (THIS->_multiplier * (1.0-THIS->_ratio)) + THIS->_ratio;
             float multiplierStep = (1.0 / attackFrames) * (1.0-THIS->_ratio);
@@ -361,7 +361,7 @@ static OSStatus filterCallback(id                        filter,
     return noErr;
 }
 
--(AEAudioControllerFilterCallback)filterCallback {
+-(AEAudioController_iOS5FilterCallback)filterCallback {
     return filterCallback;
 }
 

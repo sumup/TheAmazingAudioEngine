@@ -43,7 +43,7 @@ extern "C" {
  *
  * @param audioController The Audio Controller
  */
-- (id)initWithAudioController:(AEAudioController*)audioController;
+- (id)initWithAudioController:(AEAudioController_iOS5*)audioController;
 
 @property (nonatomic, assign) UInt32 hold;
 @property (nonatomic, assign) UInt32 attack;

@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 #import <Foundation/Foundation.h>
-#import "TheAmazingAudioEngine.h"
+#import "TheAmazingAudioEngine_iOS5.h"
 
 typedef void (^AEBlockChannelBlock)(const AudioTimeStamp     *time,
                                     UInt32                    frames,
@@ -37,14 +37,14 @@ typedef void (^AEBlockChannelBlock)(const AudioTimeStamp     *time,
 /*!
  * Block channel: Utility class to allow use of a block to generate audio
  */
-@interface AEBlockChannel : NSObject <AEAudioPlayable>
+@interface AEBlockChannel_iOS5 : NSObject <AEAudioPlayable>
 
 /*!
  * Create a new channel with a given block
  *
  * @param block Block to use for audio generation
  */
-+ (AEBlockChannel*)channelWithBlock:(AEBlockChannelBlock)block;
++ (AEBlockChannel_iOS5*)channelWithBlock:(AEBlockChannelBlock)block;
 
 /*!
  * Track volume

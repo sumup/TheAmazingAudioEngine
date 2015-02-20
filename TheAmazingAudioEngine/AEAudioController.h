@@ -1,5 +1,5 @@
 //
-//  AEAudioController.h
+//  AEAudioController_iOS5.h
 //  The Amazing Audio Engine
 //
 //  Created by Michael Tyson on 25/11/2011.
@@ -30,27 +30,27 @@ extern "C" {
 #import <AudioToolbox/AudioToolbox.h>
 #import <AudioUnit/AudioUnit.h>
 
-@class AEAudioController;
+@class AEAudioController_iOS5;
 
 #pragma mark - Notifications and constants
 
 /*!
- * @var AEAudioControllerSessionInterruptionBeganNotification
+ * @var AEAudioController_iOS5SessionInterruptionBeganNotification
  *  Notification that the audio session has been interrupted.
  *
- * @var AEAudioControllerSessionInterruptionEndedNotification
+ * @var AEAudioController_iOS5SessionInterruptionEndedNotification
  *  Notification that the audio session interrupted has ended, and control
  *  has been passed back to the application.
  *
- * @var AEAudioControllerDidRecreateGraphNotification
- *  Notification that AEAudioController has shut down and re-initialized
+ * @var AEAudioController_iOS5DidRecreateGraphNotification
+ *  Notification that AEAudioController_iOS5 has shut down and re-initialized
  *  the audio graph. This can happen in response to some unexpected system 
  *  errors. Objects that use the graph directly (such as creating audio units)
  *  should re-initialise the audio units.
  */
-extern NSString * const AEAudioControllerSessionInterruptionBeganNotification;
-extern NSString * const AEAudioControllerSessionInterruptionEndedNotification;
-extern NSString * const AEAudioControllerDidRecreateGraphNotification;
+extern NSString * const AEAudioController_iOS5SessionInterruptionBeganNotification;
+extern NSString * const AEAudioController_iOS5SessionInterruptionEndedNotification;
+extern NSString * const AEAudioController_iOS5DidRecreateGraphNotification;
 
 /*!
  * @enum AEInputMode
@@ -100,8 +100,8 @@ typedef enum {
  * @param audio             The audio buffer list - audio should be copied into the provided buffers
  * @return A status code
  */
-typedef OSStatus (*AEAudioControllerRenderCallback) (id                        channel,
-                                                     AEAudioController        *audioController,
+typedef OSStatus (*AEAudioController_iOS5RenderCallback) (id                        channel,
+                                                     AEAudioController_iOS5        *audioController,
                                                      const AudioTimeStamp     *time,
                                                      UInt32                    frames,
                                                      AudioBufferList          *audio);
@@ -110,7 +110,7 @@ typedef OSStatus (*AEAudioControllerRenderCallback) (id                        c
  * AEAudioPlayable protocol
  *
  *  The interface that a channel object must implement - this includes 'renderCallback',
- *  which is a @link AEAudioControllerRenderCallback C callback @endlink to be called when 
+ *  which is a @link AEAudioController_iOS5RenderCallback C callback @endlink to be called when 
  *  audio is required.  The callback will be passed a reference to this object, so you should
  *  implement it from within the \@implementation block to gain access to your
  *  instance variables.
@@ -125,7 +125,7 @@ typedef OSStatus (*AEAudioControllerRenderCallback) (id                        c
  *
  * @return Pointer to a render callback function
  */
-@property (nonatomic, readonly) AEAudioControllerRenderCallback renderCallback;
+@property (nonatomic, readonly) AEAudioController_iOS5RenderCallback renderCallback;
 
 @optional
 
@@ -207,8 +207,8 @@ typedef OSStatus (*AEAudioControllerRenderCallback) (id                        c
  * @param frames     The length of the audio, in frames
  * @param audio      The audio buffer list
  */
-typedef void (*AEAudioControllerAudioCallback) (id                        receiver,
-                                                AEAudioController        *audioController,
+typedef void (*AEAudioController_iOS5AudioCallback) (id                        receiver,
+                                                AEAudioController_iOS5        *audioController,
                                                 void                     *source,
                                                 const AudioTimeStamp     *time,
                                                 UInt32                    frames,
@@ -219,7 +219,7 @@ typedef void (*AEAudioControllerAudioCallback) (id                        receiv
  * AEAudioReceiver protocol
  *
  *  The interface that a object must implement to receive incoming or outgoing output audio.
- *  This includes 'receiverCallback', which is a @link AEAudioControllerAudioCallback C callback @endlink 
+ *  This includes 'receiverCallback', which is a @link AEAudioController_iOS5AudioCallback C callback @endlink 
  *  to be called when audio is available.  The callback will be passed a reference to this object, so you 
  *  should implement it from within the \@implementation block to gain access to your instance variables.
  */
@@ -233,14 +233,14 @@ typedef void (*AEAudioControllerAudioCallback) (id                        receiv
  *
  * @return Pointer to an audio callback
  */
-@property (nonatomic, readonly) AEAudioControllerAudioCallback receiverCallback;
+@property (nonatomic, readonly) AEAudioController_iOS5AudioCallback receiverCallback;
 
 @end
 
 /*!
  * Filter audio producer
  *
- *  This defines the function passed to a AEAudioControllerFilterCallback,
+ *  This defines the function passed to a AEAudioController_iOS5FilterCallback,
  *  which is used to produce input audio to be processed by the filter.
  *
  * @param producerToken    An opaque pointer to be passed to the function
@@ -248,7 +248,7 @@ typedef void (*AEAudioControllerAudioCallback) (id                        receiv
  * @param frames           Number of frames to produce on input, number of frames produced on output
  * @return A status code
  */
-typedef OSStatus (*AEAudioControllerFilterProducer)(void            *producerToken, 
+typedef OSStatus (*AEAudioController_iOS5FilterProducer)(void            *producerToken, 
                                                     AudioBufferList *audio, 
                                                     UInt32          *frames);
 
@@ -282,9 +282,9 @@ typedef OSStatus (*AEAudioControllerFilterProducer)(void            *producerTok
  * @param audio     The audio buffer list to write output audio to
  * @return A status code
  */
-typedef OSStatus (*AEAudioControllerFilterCallback)(id                        filter,
-                                                    AEAudioController        *audioController,
-                                                    AEAudioControllerFilterProducer producer,
+typedef OSStatus (*AEAudioController_iOS5FilterCallback)(id                        filter,
+                                                    AEAudioController_iOS5        *audioController,
+                                                    AEAudioController_iOS5FilterProducer producer,
                                                     void                     *producerToken,
                                                     const AudioTimeStamp     *time,
                                                     UInt32                    frames,
@@ -294,7 +294,7 @@ typedef OSStatus (*AEAudioControllerFilterCallback)(id                        fi
  * AEAudioFilter protocol
  *
  *  The interface that a filter must implement - this includes 'filterCallback', which is a 
- *  @link AEAudioControllerFilterCallback C callback @endlink to be called when
+ *  @link AEAudioController_iOS5FilterCallback C callback @endlink to be called when
  *  audio is to be filtered.  The callback will be passed a reference to this object, so you should
  *  implement it from within the \@implementation block to gain access to your
  *  instance variables.
@@ -312,7 +312,7 @@ typedef OSStatus (*AEAudioControllerFilterCallback)(id                        fi
  *
  * @return Pointer to a variable speed filter callback
  */
-@property (nonatomic, readonly) AEAudioControllerFilterCallback filterCallback;
+@property (nonatomic, readonly) AEAudioController_iOS5FilterCallback filterCallback;
 
 @end
 
@@ -356,8 +356,8 @@ typedef enum {
  * @param frames    The number of frames for the current block
  * @param context   The timing context - either input, or output
  */
-typedef void (*AEAudioControllerTimingCallback) (id                        receiver,
-                                                 AEAudioController        *audioController,
+typedef void (*AEAudioController_iOS5TimingCallback) (id                        receiver,
+                                                 AEAudioController_iOS5        *audioController,
                                                  const AudioTimeStamp     *time,
                                                  UInt32                    frames,
                                                  AEAudioTimingContext      context);
@@ -366,7 +366,7 @@ typedef void (*AEAudioControllerTimingCallback) (id                        recei
  * AEAudioTimingReceiver protocol
  *
  *  The interface that a object must implement to receive system time advance notices.
- *  This includes 'timingReceiver', which is a @link AEAudioControllerTimingCallback C callback @endlink 
+ *  This includes 'timingReceiver', which is a @link AEAudioController_iOS5TimingCallback C callback @endlink 
  *  to be called when the system time advances.  The callback will be passed a reference to this object, so you 
  *  should implement it from within the \@implementation block to gain access to your instance variables.
  */
@@ -380,7 +380,7 @@ typedef void (*AEAudioControllerTimingCallback) (id                        recei
  *
  * @return Pointer to an audio callback
  */
-@property (nonatomic, readonly) AEAudioControllerTimingCallback timingReceiverCallback;
+@property (nonatomic, readonly) AEAudioController_iOS5TimingCallback timingReceiverCallback;
 
 @end
 
@@ -388,11 +388,11 @@ typedef void (*AEAudioControllerTimingCallback) (id                        recei
 /*!
  * Channel group identifier
  *
- *  See @link AEAudioController::createChannelGroup @endlink for more info.
+ *  See @link AEAudioController_iOS5::createChannelGroup @endlink for more info.
  */
 typedef struct _channel_group_t* AEChannelGroupRef;
 
-@class AEAudioController;
+@class AEAudioController_iOS5;
 
 /*!
  * Message handler function
@@ -401,7 +401,7 @@ typedef struct _channel_group_t* AEChannelGroupRef;
  * @param userInfo          Pointer to your data
  * @param userInfoLength    Length of userInfo in bytes
  */
-typedef void (*AEAudioControllerMainThreadMessageHandler)(AEAudioController *audioController, void *userInfo, int userInfoLength);
+typedef void (*AEAudioController_iOS5MainThreadMessageHandler)(AEAudioController_iOS5 *audioController, void *userInfo, int userInfoLength);
 
 #pragma mark -
 
@@ -416,7 +416,7 @@ typedef void (*AEAudioControllerMainThreadMessageHandler)(AEAudioController *aud
  *     Note that all these can be added/removed during operation as well.
  *  4. Call @link start: @endlink to begin processing audio.
  */
-@interface AEAudioController : NSObject
+@interface AEAudioController_iOS5 : NSObject
 
 #pragma mark - Setup and start/stop
 /** @name Setup and start/stop */
@@ -1006,8 +1006,8 @@ typedef void (*AEAudioControllerMainThreadMessageHandler)(AEAudioController *aud
  * @param userInfo        Pointer to user info data to pass to handler - this will be copied.
  * @param userInfoLength  Length of userInfo in bytes.
  */
-void AEAudioControllerSendAsynchronousMessageToMainThread(AEAudioController                 *audioController, 
-                                                          AEAudioControllerMainThreadMessageHandler    handler, 
+void AEAudioController_iOS5SendAsynchronousMessageToMainThread(AEAudioController_iOS5                 *audioController, 
+                                                          AEAudioController_iOS5MainThreadMessageHandler    handler, 
                                                           void                              *userInfo,
                                                           int                                userInfoLength);
 
@@ -1050,22 +1050,22 @@ void AEAudioControllerSendAsynchronousMessageToMainThread(AEAudioController     
 /*!
  * Get access to the configured AudioStreamBasicDescription
  */
-AudioStreamBasicDescription *AEAudioControllerAudioDescription(AEAudioController *audioController);
+AudioStreamBasicDescription *AEAudioController_iOS5AudioDescription(AEAudioController_iOS5 *audioController);
 
 /*!
  * Get access to the input AudioStreamBasicDescription
  */
-AudioStreamBasicDescription *AEAudioControllerInputAudioDescription(AEAudioController *audioController);
+AudioStreamBasicDescription *AEAudioController_iOS5InputAudioDescription(AEAudioController_iOS5 *audioController);
 
 /*!
  * Convert a time span in seconds into a number of frames at the current sample rate
  */
-long AEConvertSecondsToFrames(AEAudioController *audioController, NSTimeInterval seconds);
+long AEConvertSecondsToFrames_iOS5(AEAudioController_iOS5 *audioController, NSTimeInterval seconds);
 
 /*!
  * Convert a number of frames into a time span in seconds
  */
-NSTimeInterval AEConvertFramesToSeconds(AEAudioController *audioController, long frames);
+NSTimeInterval AEConvertFramesToSeconds_iOS5(AEAudioController_iOS5 *audioController, long frames);
 
 ///@}
 #pragma mark - Properties
@@ -1294,12 +1294,12 @@ NSTimeInterval AEConvertFramesToSeconds(AEAudioController *audioController, long
  *
  *  For example:
  *
- *      timestamp.mHostTime += AEAudioControllerInputLatency(audioController)*__secondsToHostTicks;
+ *      timestamp.mHostTime += AEAudioController_iOS5InputLatency(audioController)*__secondsToHostTicks;
  *
  * @param controller The audio controller
  * @returns The currently-reported hardware input latency
  */
-NSTimeInterval AEAudioControllerInputLatency(AEAudioController *controller);
+NSTimeInterval AEAudioController_iOS5InputLatency(AEAudioController_iOS5 *controller);
 
 /*!
  * Output latency (in seconds)
@@ -1308,12 +1308,12 @@ NSTimeInterval AEAudioControllerInputLatency(AEAudioController *controller);
  *
  *  For example:
  *
- *      timestamp.mHostTime += AEAudioControllerOutputLatency(audioController)*__secondsToHostTicks;
+ *      timestamp.mHostTime += AEAudioController_iOS5OutputLatency(audioController)*__secondsToHostTicks;
  *
  * @param controller The audio controller
  * @returns The currently-reported hardware output latency
  */
-NSTimeInterval AEAudioControllerOutputLatency(AEAudioController *controller);
+NSTimeInterval AEAudioController_iOS5OutputLatency(AEAudioController_iOS5 *controller);
 
 @end
 

@@ -65,7 +65,7 @@ typedef enum {
  *
  * @param audioController The Audio Controller
  */
-- (id)initWithAudioController:(AEAudioController*)audioController;
+- (id)initWithAudioController:(AEAudioController_iOS5*)audioController;
 
 
 /*!

@@ -23,13 +23,13 @@
 //  3. This notice may not be removed or altered from any source distribution.
 //
 
-#import "AEBlockFilter.h"
+#import "AEBlockFilter_iOS5.h"
 
-@interface AEBlockFilter ()
+@interface AEBlockFilter_iOS5 ()
 @property (nonatomic, copy) AEBlockFilterBlock block;
 @end
 
-@implementation AEBlockFilter
+@implementation AEBlockFilter_iOS5
 @synthesize block = _block;
 
 - (id)initWithBlock:(AEBlockFilterBlock)block {
@@ -38,8 +38,8 @@
     return self;
 }
 
-+ (AEBlockFilter*)filterWithBlock:(AEBlockFilterBlock)block {
-    return [[[AEBlockFilter alloc] initWithBlock:block] autorelease];
++ (AEBlockFilter_iOS5*)filterWithBlock:(AEBlockFilterBlock)block {
+    return [[[AEBlockFilter_iOS5 alloc] initWithBlock:block] autorelease];
 }
 
 -(void)dealloc {
@@ -48,18 +48,18 @@
 }
 
 static OSStatus filterCallback(id                        filter,
-                               AEAudioController        *audioController,
-                               AEAudioControllerFilterProducer producer,
+                               AEAudioController_iOS5        *audioController,
+                               AEAudioController_iOS5FilterProducer producer,
                                void                     *producerToken,
                                const AudioTimeStamp     *time,
                                UInt32                    frames,
                                AudioBufferList          *audio) {
-    AEBlockFilter *THIS = (AEBlockFilter*)filter;
+    AEBlockFilter_iOS5 *THIS = (AEBlockFilter_iOS5*)filter;
     THIS->_block(producer, producerToken, time, frames, audio);
     return noErr;
 }
 
--(AEAudioControllerFilterCallback)filterCallback {
+-(AEAudioController_iOS5FilterCallback)filterCallback {
     return filterCallback;
 }
 

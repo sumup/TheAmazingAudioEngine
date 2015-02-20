@@ -38,7 +38,7 @@ extern "C" {
  *
  *  To use, create an instance, then add it to the audio controller.
  */
-@interface AEAudioFilePlayer : NSObject <AEAudioPlayable>
+@interface AEAudioFilePlayer_iOS5 : NSObject <AEAudioPlayable>
 
 /*!
  * Create a new player instance
@@ -46,9 +46,9 @@ extern "C" {
  * @param url               URL to the file to load
  * @param audioController   The audio controller
  * @param error             If not NULL, the error on output
- * @return The audio player, ready to be @link AEAudioController::addChannels: added @endlink to the audio controller.
+ * @return The audio player, ready to be @link AEAudioController_iOS5::addChannels: added @endlink to the audio controller.
  */
-+ (id)audioFilePlayerWithURL:(NSURL*)url audioController:(AEAudioController*)audioController error:(NSError**)error;
++ (id)audioFilePlayerWithURL:(NSURL*)url audioController:(AEAudioController_iOS5*)audioController error:(NSError**)error;
 
 @property (nonatomic, retain, readonly) NSURL *url;         //!< Original media URL
 @property (nonatomic, readonly) NSTimeInterval duration;    //!< Length of audio, in seconds

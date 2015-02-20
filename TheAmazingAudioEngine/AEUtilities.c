@@ -25,7 +25,7 @@
 
 #include "AEUtilities.h"
 
-AudioBufferList *AEAllocateAndInitAudioBufferList(AudioStreamBasicDescription audioFormat, int frameCount) {
+AudioBufferList *AEAllocateAndInitAudioBufferList_iOS5(AudioStreamBasicDescription audioFormat, int frameCount) {
     int numberOfBuffers = audioFormat.mFormatFlags & kAudioFormatFlagIsNonInterleaved ? audioFormat.mChannelsPerFrame : 1;
     int channelsPerBuffer = audioFormat.mFormatFlags & kAudioFormatFlagIsNonInterleaved ? 1 : audioFormat.mChannelsPerFrame;
     int bytesPerBuffer = audioFormat.mBytesPerFrame * frameCount;
@@ -52,7 +52,7 @@ AudioBufferList *AEAllocateAndInitAudioBufferList(AudioStreamBasicDescription au
     return audio;
 }
 
-AudioBufferList *AECopyAudioBufferList(AudioBufferList *original) {
+AudioBufferList *AECopyAudioBufferList_iOS5(AudioBufferList *original) {
     AudioBufferList *audio = malloc(sizeof(AudioBufferList) + (original->mNumberBuffers-1)*sizeof(AudioBuffer));
     if ( !audio ) {
         return NULL;
@@ -72,14 +72,14 @@ AudioBufferList *AECopyAudioBufferList(AudioBufferList *original) {
     return audio;
 }
 
-void AEFreeAudioBufferList(AudioBufferList *bufferList ) {
+void AEFreeAudioBufferList_iOS5(AudioBufferList *bufferList ) {
     for ( int i=0; i<bufferList->mNumberBuffers; i++ ) {
         if ( bufferList->mBuffers[i].mData ) free(bufferList->mBuffers[i].mData);
     }
     free(bufferList);
 }
 
-void AEInitAudioBufferList(AudioBufferList *list, int listSize, AudioStreamBasicDescription audioFormat, void *data, int dataSize) {
+void AEInitAudioBufferList_iOS5(AudioBufferList *list, int listSize, AudioStreamBasicDescription audioFormat, void *data, int dataSize) {
     list->mNumberBuffers = audioFormat.mFormatFlags & kAudioFormatFlagIsNonInterleaved ? audioFormat.mChannelsPerFrame : 1;
     assert(list->mNumberBuffers == 1 || listSize >= (sizeof(AudioBufferList)+sizeof(AudioBuffer)) );
     
@@ -90,7 +90,7 @@ void AEInitAudioBufferList(AudioBufferList *list, int listSize, AudioStreamBasic
     }
 }
 
-int AEGetNumberOfFramesInAudioBufferList(AudioBufferList *list, AudioStreamBasicDescription audioFormat, int *oNumberOfChannels) {
+int AEGetNumberOfFramesInAudioBufferList_iOS5(AudioBufferList *list, AudioStreamBasicDescription audioFormat, int *oNumberOfChannels) {
     int channelCount = audioFormat.mFormatFlags & kAudioFormatFlagIsNonInterleaved ? list->mNumberBuffers : list->mBuffers[0].mNumberChannels;
     if ( oNumberOfChannels ) {
         *oNumberOfChannels = channelCount;
@@ -98,7 +98,7 @@ int AEGetNumberOfFramesInAudioBufferList(AudioBufferList *list, AudioStreamBasic
     return list->mBuffers[0].mDataByteSize / ((audioFormat.mBitsPerChannel/8) * channelCount);
 }
 
-AudioComponentDescription AEAudioComponentDescriptionMake(OSType manufacturer, OSType type, OSType subtype) {
+AudioComponentDescription AEAudioComponentDescriptionMake_iOS5(OSType manufacturer, OSType type, OSType subtype) {
     AudioComponentDescription description;
     memset(&description, 0, sizeof(description));
     description.componentManufacturer = manufacturer;
@@ -107,7 +107,7 @@ AudioComponentDescription AEAudioComponentDescriptionMake(OSType manufacturer, O
     return description;
 }
 
-void AEAudioStreamBasicDescriptionSetChannelsPerFrame(AudioStreamBasicDescription *audioDescription, int numberOfChannels) {
+void AEAudioStreamBasicDescriptionSetChannelsPerFrame_iOS5(AudioStreamBasicDescription *audioDescription, int numberOfChannels) {
     if ( !(audioDescription->mFormatFlags & kAudioFormatFlagIsNonInterleaved) ) {
         audioDescription->mBytesPerFrame *= (float)numberOfChannels / (float)audioDescription->mChannelsPerFrame;
         audioDescription->mBytesPerPacket *= (float)numberOfChannels / (float)audioDescription->mChannelsPerFrame;

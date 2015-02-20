@@ -23,10 +23,10 @@
 //  3. This notice may not be removed or altered from any source distribution.
 //
 
-#import "AEAudioFileWriter.h"
-#import "TheAmazingAudioEngine.h"
+#import "AEAudioFileWriter_iOS5.h"
+#import "TheAmazingAudioEngine_iOS5.h"
 
-NSString * const AEAudioFileWriterErrorDomain = @"com.theamazingaudioengine.AEAudioFileWriterErrorDomain";
+NSString * const AEAudioFileWriterErrorDomain_iOS5 = @"com.theamazingaudioengine.AEAudioFileWriterErrorDomain";
 
 #define checkResult(result,operation) (_checkResult((result),(operation),strrchr(__FILE__, '/')+1,__LINE__))
 static inline BOOL _checkResult(OSStatus result, const char *operation, const char* file, int line) {
@@ -37,7 +37,7 @@ static inline BOOL _checkResult(OSStatus result, const char *operation, const ch
     return YES;
 }
 
-@interface AEAudioFileWriter () {
+@interface AEAudioFileWriter_iOS5 () {
     BOOL                        _writing;
     ExtAudioFileRef             _audioFile;
     UInt32                      _priorMixOverrideValue;
@@ -47,7 +47,7 @@ static inline BOOL _checkResult(OSStatus result, const char *operation, const ch
 @property (nonatomic, retain, readwrite) NSString *path;
 @end
 
-@implementation AEAudioFileWriter
+@implementation AEAudioFileWriter_iOS5
 @synthesize path = _path;
 
 + (BOOL)AACEncodingAvailable {
@@ -109,8 +109,8 @@ static inline BOOL _checkResult(OSStatus result, const char *operation, const ch
     OSStatus status;
     
     if ( fileType == kAudioFileM4AType ) {
-        if ( ![AEAudioFileWriter AACEncodingAvailable] ) {
-            if ( error ) *error = [NSError errorWithDomain:AEAudioFileWriterErrorDomain 
+        if ( ![AEAudioFileWriter_iOS5 AACEncodingAvailable] ) {
+            if ( error ) *error = [NSError errorWithDomain:AEAudioFileWriterErrorDomain_iOS5 
                                                       code:kAEAudioFileWriterFormatError 
                                                   userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"AAC Encoding not available", @"")
                                                                                        forKey:NSLocalizedDescriptionKey]];
@@ -238,11 +238,11 @@ static inline BOOL _checkResult(OSStatus result, const char *operation, const ch
     }
 }
 
-OSStatus AEAudioFileWriterAddAudio(AEAudioFileWriter* THIS, AudioBufferList *bufferList, UInt32 lengthInFrames) {
+OSStatus AEAudioFileWriterAddAudio(AEAudioFileWriter_iOS5* THIS, AudioBufferList *bufferList, UInt32 lengthInFrames) {
     return ExtAudioFileWriteAsync(THIS->_audioFile, lengthInFrames, bufferList);
 }
 
-OSStatus AEAudioFileWriterAddAudioSynchronously(AEAudioFileWriter* THIS, AudioBufferList *bufferList, UInt32 lengthInFrames) {
+OSStatus AEAudioFileWriterAddAudioSynchronously(AEAudioFileWriter_iOS5* THIS, AudioBufferList *bufferList, UInt32 lengthInFrames) {
     return ExtAudioFileWrite(THIS->_audioFile, lengthInFrames, bufferList);
 }
 

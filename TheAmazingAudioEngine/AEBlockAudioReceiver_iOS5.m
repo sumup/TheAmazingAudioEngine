@@ -23,13 +23,13 @@
 //  3. This notice may not be removed or altered from any source distribution.
 //
 
-#import "AEBlockAudioReceiver.h"
+#import "AEBlockAudioReceiver_iOS5.h"
 
-@interface AEBlockAudioReceiver ()
+@interface AEBlockAudioReceiver_iOS5 ()
 @property (nonatomic, copy) AEBlockAudioReceiverBlock block;
 @end
 
-@implementation AEBlockAudioReceiver
+@implementation AEBlockAudioReceiver_iOS5
 @synthesize block = _block;
 
 - (id)initWithBlock:(AEBlockAudioReceiverBlock)block {
@@ -38,8 +38,8 @@
     return self;
 }
 
-+ (AEBlockAudioReceiver*)audioReceiverWithBlock:(AEBlockAudioReceiverBlock)block {
-    return [[[AEBlockAudioReceiver alloc] initWithBlock:block] autorelease];
++ (AEBlockAudioReceiver_iOS5*)audioReceiverWithBlock:(AEBlockAudioReceiverBlock)block {
+    return [[[AEBlockAudioReceiver_iOS5 alloc] initWithBlock:block] autorelease];
 }
 
 -(void)dealloc {
@@ -48,16 +48,16 @@
 }
 
 static void receiverCallback(id                        receiver,
-                             AEAudioController        *audioController,
+                             AEAudioController_iOS5   *audioController,
                              void                     *source,
                              const AudioTimeStamp     *time,
                              UInt32                    frames,
                              AudioBufferList          *audio) {
-    AEBlockAudioReceiver *THIS = (AEBlockAudioReceiver*)receiver;
+    AEBlockAudioReceiver_iOS5 *THIS = (AEBlockAudioReceiver_iOS5*)receiver;
     THIS->_block(source, time, frames, audio);
 }
 
--(AEAudioControllerAudioCallback)receiverCallback {
+-(AEAudioController_iOS5AudioCallback)receiverCallback {
     return receiverCallback;
 }
 

@@ -16,11 +16,11 @@ extern "C" {
 /*!
  * Schedule information dictionary keys
  */
-extern NSString const * AEBlockSchedulerKeyBlock;
-extern NSString const * AEBlockSchedulerKeyTimestampInHostTicks;
-extern NSString const * AEBlockSchedulerKeyResponseBlock;
-extern NSString const * AEBlockSchedulerKeyIdentifier;
-extern NSString const * AEBlockSchedulerKeyTimingContext;
+extern NSString const * AEBlockSchedulerKeyBlock_iOS5;
+extern NSString const * AEBlockSchedulerKeyTimestampInHostTicks_iOS5;
+extern NSString const * AEBlockSchedulerKeyResponseBlock_iOS5;
+extern NSString const * AEBlockSchedulerKeyIdentifier_iOS5;
+extern NSString const * AEBlockSchedulerKeyTimingContext_iOS5;
 
 /*!
  * Scheduler block format
@@ -47,11 +47,11 @@ typedef void (^AEBlockSchedulerResponseBlock)();
  *  a particular time, on the Core Audio thread.
  *
  *  To use this class, create an instance, then add it as a timing
- *  receiver using AEAudioController's @link AEAudioController::addTimingReceiver: addTimingReceiver: @endlink.
+ *  receiver using AEAudioController_iOS5's @link AEAudioController_iOS5::addTimingReceiver: addTimingReceiver: @endlink.
  *
  *  Then begin scheduling blocks using @link scheduleBlock:atTime:timingContext:identifier: @endlink.
  */
-@interface AEBlockScheduler : NSObject <AEAudioTimingReceiver>
+@interface AEBlockScheduler_iOS5 : NSObject <AEAudioTimingReceiver>
 
 /*!
  * Utility: Get current time
@@ -88,13 +88,13 @@ typedef void (^AEBlockSchedulerResponseBlock)();
  *
  * @param audioController The audio controller
  */
-- (id)initWithAudioController:(AEAudioController*)audioController;
+- (id)initWithAudioController:(AEAudioController_iOS5*)audioController;
 
 /*!
  * Schedule a block for execution
  *
  *  Once scheduled, the given block will be performed at or before the given
- *  time. Depending on the [hardware buffer duration](@ref AEAudioController::preferredBufferDuration),
+ *  time. Depending on the [hardware buffer duration](@ref AEAudioController_iOS5::preferredBufferDuration),
  *  this may occur some milliseconds before the scheduled time.
  *
  *  The actual time corresponding to the beginning of the time interval in which the
@@ -119,7 +119,7 @@ typedef void (^AEBlockSchedulerResponseBlock)();
  * Schedule a block for execution, with a response block to be performed on the main thread
  *
  *  Once scheduled, the given block will be performed at or before the given
- *  time. Depending on the [hardware buffer duration](@ref AEAudioController::preferredBufferDuration),
+ *  time. Depending on the [hardware buffer duration](@ref AEAudioController_iOS5::preferredBufferDuration),
  *  this may occur some milliseconds before the scheduled time.
  *
  *  The actual time corresponding to the beginning of the time interval in which the

@@ -47,7 +47,7 @@ typedef struct {
 static inline int min(int a, int b) { return a>b ? b : a; }
 
 @interface AELimiter () {
-    TPCircularBuffer _buffer;
+    TPCircularBuffer_iOS5 _buffer;
     float            _gain;
     AELimiterState   _state;
     int              _framesSinceLastTrigger;
@@ -67,7 +67,7 @@ static element_t findNextTriggerValueInRange(AELimiter *THIS, AudioBufferList *d
 - (id)initWithNumberOfChannels:(NSInteger)numberOfChannels sampleRate:(Float32)sampleRate {
     if ( !(self = [super init]) ) return nil;
     
-    TPCircularBufferInit(&_buffer, kBufferSize*numberOfChannels);
+    TPCircularBufferInit_iOS5(&_buffer, kBufferSize*numberOfChannels);
     self.hold = 22050;
     self.decay = 44100;
     self.attack = 2048;
@@ -100,7 +100,7 @@ BOOL AELimiterEnqueue(AELimiter *THIS, float** buffers, UInt32 length, const Aud
         bufferList->mBuffers[i].mNumberChannels = 1;
     }
     
-    return TPCircularBufferCopyAudioBufferList(&THIS->_buffer, bufferList, timestamp, kTPCircularBufferCopyAll, NULL);
+    return TPCircularBufferCopyAudioBufferList_iOS5(&THIS->_buffer, bufferList, timestamp, kTPCircularBufferCopyAll, NULL);
 }
 
 void AELimiterDequeue(AELimiter *THIS, float** buffers, UInt32 *ioLength, AudioTimeStamp *timestamp) {
@@ -124,7 +124,7 @@ static void _AELimiterDequeue(AELimiter *THIS, float** buffers, UInt32 *ioLength
         bufferList->mBuffers[i].mNumberChannels = 1;
     }
     THIS->_audioDescription.mChannelsPerFrame = numberOfBuffers;
-    TPCircularBufferDequeueBufferListFrames(&THIS->_buffer, ioLength, bufferList, timestamp, &THIS->_audioDescription);
+    TPCircularBufferDequeueBufferListFrames_iOS5(&THIS->_buffer, ioLength, bufferList, timestamp, &THIS->_audioDescription);
     
     // Now apply limiting
     int frameNumber = 0;
@@ -285,10 +285,10 @@ static void _AELimiterDequeue(AELimiter *THIS, float** buffers, UInt32 *ioLength
 UInt32 AELimiterFillCount(AELimiter *THIS, AudioTimeStamp *timestamp, UInt32 *trueFillCount) {
     if ( timestamp ) memset(timestamp, 0, sizeof(AudioTimeStamp));
     int fillCount = 0;
-    AudioBufferList *bufferList = TPCircularBufferNextBufferList(&THIS->_buffer, timestamp);
+    AudioBufferList *bufferList = TPCircularBufferNextBufferList_iOS5(&THIS->_buffer, timestamp);
     while ( bufferList ) {
         fillCount += bufferList->mBuffers[0].mDataByteSize / sizeof(float);
-        bufferList = TPCircularBufferNextBufferListAfter(&THIS->_buffer, bufferList, NULL);
+        bufferList = TPCircularBufferNextBufferListAfter_iOS5(&THIS->_buffer, bufferList, NULL);
     }
     if ( trueFillCount ) *trueFillCount = fillCount;
     return MAX(0, fillCount - (int)THIS->_attack);
@@ -300,7 +300,7 @@ void AELimiterReset(AELimiter *THIS) {
     THIS->_framesSinceLastTrigger = kNoValue;
     THIS->_framesToNextTrigger = kNoValue;
     THIS->_triggerValue = 0;
-    TPCircularBufferClear(&THIS->_buffer);
+    TPCircularBufferClear_iOS5(&THIS->_buffer);
 }
 
 static inline void advanceTime(AELimiter *THIS, UInt32 frames) {
@@ -347,8 +347,8 @@ static element_t findNextTriggerValueInRange(AELimiter *THIS, AudioBufferList *d
         }
         
         buffer = buffer == dequeuedBufferList 
-            ? TPCircularBufferNextBufferList(&THIS->_buffer, NULL) :
-              TPCircularBufferNextBufferListAfter(&THIS->_buffer, buffer, NULL);
+            ? TPCircularBufferNextBufferList_iOS5(&THIS->_buffer, NULL) :
+              TPCircularBufferNextBufferListAfter_iOS5(&THIS->_buffer, buffer, NULL);
     }
     
     return (element_t) {0, 0};
@@ -389,8 +389,8 @@ static element_t findMaxValueInRange(AELimiter *THIS, AudioBufferList *dequeuedB
         }
         
         buffer = buffer == dequeuedBufferList 
-            ? TPCircularBufferNextBufferList(&THIS->_buffer, NULL) :
-              TPCircularBufferNextBufferListAfter(&THIS->_buffer, buffer, NULL);
+            ? TPCircularBufferNextBufferList_iOS5(&THIS->_buffer, NULL) :
+              TPCircularBufferNextBufferListAfter_iOS5(&THIS->_buffer, buffer, NULL);
     }
     
     return (element_t) { .value = max, .index = index};

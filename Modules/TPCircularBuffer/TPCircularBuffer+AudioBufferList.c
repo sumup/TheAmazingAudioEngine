@@ -43,10 +43,10 @@ static inline long min(long a, long b) {
     return a > b ? b : a;
 }
 
-AudioBufferList *TPCircularBufferPrepareEmptyAudioBufferList(TPCircularBuffer *buffer, int numberOfBuffers, int bytesPerBuffer, const AudioTimeStamp *inTimestamp) {
+AudioBufferList *TPCircularBufferPrepareEmptyAudioBufferList_iOS5(TPCircularBuffer_iOS5 *buffer, int numberOfBuffers, int bytesPerBuffer, const AudioTimeStamp *inTimestamp) {
     int32_t availableBytes;
-    TPCircularBufferABLBlockHeader *block = (TPCircularBufferABLBlockHeader*)TPCircularBufferHead(buffer, &availableBytes);
-    if ( !block || availableBytes < sizeof(TPCircularBufferABLBlockHeader)+((numberOfBuffers-1)*sizeof(AudioBuffer))+(numberOfBuffers*bytesPerBuffer) ) return NULL;
+    TPCircularBufferABLBlockHeader_iOS5 *block = (TPCircularBufferABLBlockHeader_iOS5*)TPCircularBufferHead_iOS5(buffer, &availableBytes);
+    if ( !block || availableBytes < sizeof(TPCircularBufferABLBlockHeader_iOS5)+((numberOfBuffers-1)*sizeof(AudioBuffer))+(numberOfBuffers*bytesPerBuffer) ) return NULL;
     
     assert(!((unsigned long)block & 0xF) /* Beware unaligned accesses */);
     
@@ -84,16 +84,16 @@ AudioBufferList *TPCircularBufferPrepareEmptyAudioBufferList(TPCircularBuffer *b
     return &block->bufferList;
 }
 
-AudioBufferList *TPCircularBufferPrepareEmptyAudioBufferListWithAudioFormat(TPCircularBuffer *buffer, AudioStreamBasicDescription *audioFormat, UInt32 frameCount, const AudioTimeStamp *timestamp) {
-    return TPCircularBufferPrepareEmptyAudioBufferList(buffer,
+AudioBufferList *TPCircularBufferPrepareEmptyAudioBufferListWithAudioFormat_iOS5(TPCircularBuffer_iOS5 *buffer, AudioStreamBasicDescription *audioFormat, UInt32 frameCount, const AudioTimeStamp *timestamp) {
+    return TPCircularBufferPrepareEmptyAudioBufferList_iOS5(buffer,
                                                        (audioFormat->mFormatFlags & kAudioFormatFlagIsNonInterleaved) ? audioFormat->mChannelsPerFrame : 1,
                                                        audioFormat->mBytesPerFrame * frameCount,
                                                        timestamp);
 }
 
-void TPCircularBufferProduceAudioBufferList(TPCircularBuffer *buffer, const AudioTimeStamp *inTimestamp) {
+void TPCircularBufferProduceAudioBufferList_iOS5(TPCircularBuffer_iOS5 *buffer, const AudioTimeStamp *inTimestamp) {
     int32_t availableBytes;
-    TPCircularBufferABLBlockHeader *block = (TPCircularBufferABLBlockHeader*)TPCircularBufferHead(buffer, &availableBytes);
+    TPCircularBufferABLBlockHeader_iOS5 *block = (TPCircularBufferABLBlockHeader_iOS5*)TPCircularBufferHead_iOS5(buffer, &availableBytes);
     
     assert(block);
     
@@ -112,10 +112,10 @@ void TPCircularBufferProduceAudioBufferList(TPCircularBuffer *buffer, const Audi
     
     block->totalLength = calculatedLength;
     
-    TPCircularBufferProduce(buffer, block->totalLength);
+    TPCircularBufferProduce_iOS5(buffer, block->totalLength);
 }
 
-bool TPCircularBufferCopyAudioBufferList(TPCircularBuffer *buffer, const AudioBufferList *inBufferList, const AudioTimeStamp *inTimestamp, UInt32 frames, const AudioStreamBasicDescription *audioDescription) {
+bool TPCircularBufferCopyAudioBufferList_iOS5(TPCircularBuffer_iOS5 *buffer, const AudioBufferList *inBufferList, const AudioTimeStamp *inTimestamp, UInt32 frames, const AudioStreamBasicDescription *audioDescription) {
     if ( frames == 0 ) return true;
     
     int byteCount = inBufferList->mBuffers[0].mDataByteSize;
@@ -126,29 +126,29 @@ bool TPCircularBufferCopyAudioBufferList(TPCircularBuffer *buffer, const AudioBu
     
     if ( byteCount == 0 ) return true;
     
-    AudioBufferList *bufferList = TPCircularBufferPrepareEmptyAudioBufferList(buffer, inBufferList->mNumberBuffers, byteCount, inTimestamp);
+    AudioBufferList *bufferList = TPCircularBufferPrepareEmptyAudioBufferList_iOS5(buffer, inBufferList->mNumberBuffers, byteCount, inTimestamp);
     if ( !bufferList ) return false;
     
     for ( int i=0; i<bufferList->mNumberBuffers; i++ ) {
         memcpy(bufferList->mBuffers[i].mData, inBufferList->mBuffers[i].mData, byteCount);
     }
     
-    TPCircularBufferProduceAudioBufferList(buffer, NULL);
+    TPCircularBufferProduceAudioBufferList_iOS5(buffer, NULL);
     
     return true;
 }
 
-AudioBufferList *TPCircularBufferNextBufferListAfter(TPCircularBuffer *buffer, AudioBufferList *bufferList, AudioTimeStamp *outTimestamp) {
+AudioBufferList *TPCircularBufferNextBufferListAfter_iOS5(TPCircularBuffer_iOS5 *buffer, AudioBufferList *bufferList, AudioTimeStamp *outTimestamp) {
     int32_t availableBytes;
-    void *tail = TPCircularBufferTail(buffer, &availableBytes);
+    void *tail = TPCircularBufferTail_iOS5(buffer, &availableBytes);
     void *end = (char*)tail + availableBytes;
     assert((void*)bufferList > (void*)tail && (void*)bufferList < end);
     
-    TPCircularBufferABLBlockHeader *originalBlock = (TPCircularBufferABLBlockHeader*)((char*)bufferList - offsetof(TPCircularBufferABLBlockHeader, bufferList));
+    TPCircularBufferABLBlockHeader_iOS5 *originalBlock = (TPCircularBufferABLBlockHeader_iOS5*)((char*)bufferList - offsetof(TPCircularBufferABLBlockHeader_iOS5, bufferList));
     assert(!((unsigned long)originalBlock & 0xF) /* Beware unaligned accesses */);
     
     
-    TPCircularBufferABLBlockHeader *nextBlock = (TPCircularBufferABLBlockHeader*)((char*)originalBlock + originalBlock->totalLength);
+    TPCircularBufferABLBlockHeader_iOS5 *nextBlock = (TPCircularBufferABLBlockHeader_iOS5*)((char*)originalBlock + originalBlock->totalLength);
     if ( (void*)nextBlock >= end ) return NULL;
     assert(!((unsigned long)nextBlock & 0xF) /* Beware unaligned accesses */);
     
@@ -159,18 +159,18 @@ AudioBufferList *TPCircularBufferNextBufferListAfter(TPCircularBuffer *buffer, A
     return &nextBlock->bufferList;
 }
 
-void TPCircularBufferConsumeNextBufferListPartial(TPCircularBuffer *buffer, int framesToConsume, const AudioStreamBasicDescription *audioFormat) {
+void TPCircularBufferConsumeNextBufferListPartial_iOS5(TPCircularBuffer_iOS5 *buffer, int framesToConsume, const AudioStreamBasicDescription *audioFormat) {
     assert(framesToConsume >= 0);
     
     int32_t dontcare;
-    TPCircularBufferABLBlockHeader *block = (TPCircularBufferABLBlockHeader*)TPCircularBufferTail(buffer, &dontcare);
+    TPCircularBufferABLBlockHeader_iOS5 *block = (TPCircularBufferABLBlockHeader_iOS5*)TPCircularBufferTail_iOS5(buffer, &dontcare);
     if ( !block ) return;
     assert(!((unsigned long)block & 0xF)); // Beware unaligned accesses
     
     int bytesToConsume = (int)min(framesToConsume * audioFormat->mBytesPerFrame, block->bufferList.mBuffers[0].mDataByteSize);
     
     if ( bytesToConsume == block->bufferList.mBuffers[0].mDataByteSize ) {
-        TPCircularBufferConsumeNextBufferList(buffer);
+        TPCircularBufferConsumeNextBufferList_iOS5(buffer);
         return;
     }
     
@@ -195,19 +195,19 @@ void TPCircularBufferConsumeNextBufferListPartial(TPCircularBuffer *buffer, int 
     }
     
     // Reposition block forward, just before the audio data, ensuring 16-byte alignment
-    TPCircularBufferABLBlockHeader *newBlock = (TPCircularBufferABLBlockHeader*)(((unsigned long)block + bytesToConsume) & ~0xFul);
-    memmove(newBlock, block, sizeof(TPCircularBufferABLBlockHeader) + (block->bufferList.mNumberBuffers-1)*sizeof(AudioBuffer));
+    TPCircularBufferABLBlockHeader_iOS5 *newBlock = (TPCircularBufferABLBlockHeader_iOS5*)(((unsigned long)block + bytesToConsume) & ~0xFul);
+    memmove(newBlock, block, sizeof(TPCircularBufferABLBlockHeader_iOS5) + (block->bufferList.mNumberBuffers-1)*sizeof(AudioBuffer));
     int32_t bytesFreed = (int32_t)newBlock - (int32_t)block;
     newBlock->totalLength -= bytesFreed;
-    TPCircularBufferConsume(buffer, bytesFreed);
+    TPCircularBufferConsume_iOS5(buffer, bytesFreed);
 }
 
-void TPCircularBufferDequeueBufferListFrames(TPCircularBuffer *buffer, UInt32 *ioLengthInFrames, AudioBufferList *outputBufferList, AudioTimeStamp *outTimestamp, const AudioStreamBasicDescription *audioFormat) {
+void TPCircularBufferDequeueBufferListFrames_iOS5(TPCircularBuffer_iOS5 *buffer, UInt32 *ioLengthInFrames, AudioBufferList *outputBufferList, AudioTimeStamp *outTimestamp, const AudioStreamBasicDescription *audioFormat) {
     bool hasTimestamp = false;
     UInt32 bytesToGo = *ioLengthInFrames * audioFormat->mBytesPerFrame;
     UInt32 bytesCopied = 0;
     while ( bytesToGo > 0 ) {
-        AudioBufferList *bufferList = TPCircularBufferNextBufferList(buffer, !hasTimestamp ? outTimestamp : NULL);
+        AudioBufferList *bufferList = TPCircularBufferNextBufferList_iOS5(buffer, !hasTimestamp ? outTimestamp : NULL);
         if ( !bufferList ) break;
         
         hasTimestamp = true;
@@ -220,7 +220,7 @@ void TPCircularBufferDequeueBufferListFrames(TPCircularBuffer *buffer, UInt32 *i
             }
         }
         
-        TPCircularBufferConsumeNextBufferListPartial(buffer, (int)bytesToCopy/audioFormat->mBytesPerFrame, audioFormat);
+        TPCircularBufferConsumeNextBufferListPartial_iOS5(buffer, (int)bytesToCopy/audioFormat->mBytesPerFrame, audioFormat);
         
         bytesToGo -= bytesToCopy;
         bytesCopied += bytesToCopy;
@@ -229,9 +229,9 @@ void TPCircularBufferDequeueBufferListFrames(TPCircularBuffer *buffer, UInt32 *i
     *ioLengthInFrames -= bytesToGo / audioFormat->mBytesPerFrame;
 }
 
-static UInt32 _TPCircularBufferPeek(TPCircularBuffer *buffer, AudioTimeStamp *outTimestamp, const AudioStreamBasicDescription *audioFormat, UInt32 contiguousToleranceSampleTime) {
+static UInt32 _TPCircularBufferPeek_iOS5(TPCircularBuffer_iOS5 *buffer, AudioTimeStamp *outTimestamp, const AudioStreamBasicDescription *audioFormat, UInt32 contiguousToleranceSampleTime) {
     int32_t availableBytes;
-    TPCircularBufferABLBlockHeader *block = (TPCircularBufferABLBlockHeader*)TPCircularBufferTail(buffer, &availableBytes);
+    TPCircularBufferABLBlockHeader_iOS5 *block = (TPCircularBufferABLBlockHeader_iOS5*)TPCircularBufferTail_iOS5(buffer, &availableBytes);
     if ( !block ) return 0;
     assert(!((unsigned long)block & 0xF) /* Beware unaligned accesses */);
     
@@ -245,7 +245,7 @@ static UInt32 _TPCircularBufferPeek(TPCircularBuffer *buffer, AudioTimeStamp *ou
     
     while ( 1 ) {
         byteCount += block->bufferList.mBuffers[0].mDataByteSize;
-        TPCircularBufferABLBlockHeader *nextBlock = (TPCircularBufferABLBlockHeader*)((char*)block + block->totalLength);
+        TPCircularBufferABLBlockHeader_iOS5 *nextBlock = (TPCircularBufferABLBlockHeader_iOS5*)((char*)block + block->totalLength);
         if ( (void*)nextBlock >= end ||
                 (contiguousToleranceSampleTime != UINT32_MAX
                     && labs(nextBlock->timestamp.mSampleTime - (block->timestamp.mSampleTime + (block->bufferList.mBuffers[0].mDataByteSize / audioFormat->mBytesPerFrame))) > contiguousToleranceSampleTime) ) {
@@ -258,10 +258,10 @@ static UInt32 _TPCircularBufferPeek(TPCircularBuffer *buffer, AudioTimeStamp *ou
     return byteCount / audioFormat->mBytesPerFrame;
 }
 
-UInt32 TPCircularBufferPeek(TPCircularBuffer *buffer, AudioTimeStamp *outTimestamp, const AudioStreamBasicDescription *audioFormat) {
-    return _TPCircularBufferPeek(buffer, outTimestamp, audioFormat, UINT32_MAX);
+UInt32 TPCircularBufferPeek_iOS5(TPCircularBuffer_iOS5 *buffer, AudioTimeStamp *outTimestamp, const AudioStreamBasicDescription *audioFormat) {
+    return _TPCircularBufferPeek_iOS5(buffer, outTimestamp, audioFormat, UINT32_MAX);
 }
 
-UInt32 TPCircularBufferPeekContiguous(TPCircularBuffer *buffer, AudioTimeStamp *outTimestamp, const AudioStreamBasicDescription *audioFormat, UInt32 contiguousToleranceSampleTime) {
-    return _TPCircularBufferPeek(buffer, outTimestamp, audioFormat, contiguousToleranceSampleTime);
+UInt32 TPCircularBufferPeekContiguous_iOS5(TPCircularBuffer_iOS5 *buffer, AudioTimeStamp *outTimestamp, const AudioStreamBasicDescription *audioFormat, UInt32 contiguousToleranceSampleTime) {
+    return _TPCircularBufferPeek_iOS5(buffer, outTimestamp, audioFormat, contiguousToleranceSampleTime);
 }

@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 #import <Foundation/Foundation.h>
-#import "TheAmazingAudioEngine.h"
+#import "TheAmazingAudioEngine_iOS5.h"
 
 /*!
  * Audio Unit Filter
@@ -38,7 +38,7 @@ extern "C" {
  *  corresponding audio unit will be initialised, ready for use
  *
  */
-@interface AEAudioUnitFilter : NSObject <AEAudioFilter>
+@interface AEAudioUnitFilter_iOS5 : NSObject <AEAudioFilter>
 
 /*!
  * Create a new Audio Unit filter
@@ -49,7 +49,7 @@ extern "C" {
  * @return The initialised filter, or nil if an error occurred
  */
 - (id)initWithComponentDescription:(AudioComponentDescription)audioComponentDescription
-                   audioController:(AEAudioController*)audioController
+                   audioController:(AEAudioController_iOS5*)audioController
                              error:(NSError**)error;
 
 /*!
@@ -65,7 +65,7 @@ extern "C" {
  * @return The initialised filter, or nil if an error occurred
  */
 - (id)initWithComponentDescription:(AudioComponentDescription)audioComponentDescription
-                   audioController:(AEAudioController*)audioController
+                   audioController:(AEAudioController_iOS5*)audioController
              useDefaultInputFormat:(BOOL)useDefaultInputFormat
                              error:(NSError**)error;
 
@@ -84,7 +84,7 @@ extern "C" {
  * @return The initialised filter, or nil if an error occurred
  */
 - (id)initWithComponentDescription:(AudioComponentDescription)audioComponentDescription
-                   audioController:(AEAudioController*)audioController
+                   audioController:(AEAudioController_iOS5*)audioController
              useDefaultInputFormat:(BOOL)useDefaultInputFormat
                 preInitializeBlock:(void(^)(AudioUnit audioUnit))block
                              error:(NSError**)error;

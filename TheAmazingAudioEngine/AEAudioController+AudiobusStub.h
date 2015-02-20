@@ -1,5 +1,5 @@
 //
-//  AEAudioController+AudiobusStub.h
+//  AEAudioController_iOS5+AudiobusStub.h
 //  TheAmazingAudioEngine
 //
 //  Created by Michael Tyson on 07/05/2012.

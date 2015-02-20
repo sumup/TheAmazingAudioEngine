@@ -23,7 +23,7 @@
 //  3. This notice may not be removed or altered from any source distribution.
 //
 
-#import "AEAudioFileLoaderOperation.h"
+#import "AEAudioFileLoaderOperation_iOS5.h"
 #import "AEUtilities.h"
 
 #define checkResult(result,operation) (_checkResult((result),(operation),strrchr(__FILE__, '/')+1,__LINE__))
@@ -38,7 +38,7 @@ static inline BOOL _checkResult(OSStatus result, const char *operation, const ch
 static const int kIncrementalLoadBufferSize = 4096;
 static const int kMaxAudioFileReadSize = 16384;
 
-@interface AEAudioFileLoaderOperation ()
+@interface AEAudioFileLoaderOperation_iOS5 ()
 @property (nonatomic, retain) NSURL *url;
 @property (nonatomic, assign) AudioStreamBasicDescription targetAudioDescription;
 @property (nonatomic, readwrite) AudioBufferList *bufferList;
@@ -46,7 +46,7 @@ static const int kMaxAudioFileReadSize = 16384;
 @property (nonatomic, retain, readwrite) NSError *error;
 @end
 
-@implementation AEAudioFileLoaderOperation
+@implementation AEAudioFileLoaderOperation_iOS5
 @synthesize url = _url, targetAudioDescription = _targetAudioDescription, audioReceiverBlock = _audioReceiverBlock, bufferList = _bufferList, lengthInFrames = _lengthInFrames, error = _error;
 
 + (BOOL)infoForFileAtURL:(NSURL*)url audioDescription:(AudioStreamBasicDescription*)audioDescription lengthInFrames:(UInt32*)lengthInFrames error:(NSError**)error {
@@ -183,7 +183,7 @@ static const int kMaxAudioFileReadSize = 16384;
     // Prepare buffers
     int bufferCount = (_targetAudioDescription.mFormatFlags & kAudioFormatFlagIsNonInterleaved) ? _targetAudioDescription.mChannelsPerFrame : 1;
     int channelsPerBuffer = (_targetAudioDescription.mFormatFlags & kAudioFormatFlagIsNonInterleaved) ? 1 : _targetAudioDescription.mChannelsPerFrame;
-    AudioBufferList *bufferList = AEAllocateAndInitAudioBufferList(_targetAudioDescription, _audioReceiverBlock ? kIncrementalLoadBufferSize : (UInt32)fileLengthInFrames);
+    AudioBufferList *bufferList = AEAllocateAndInitAudioBufferList_iOS5(_targetAudioDescription, _audioReceiverBlock ? kIncrementalLoadBufferSize : (UInt32)fileLengthInFrames);
     if ( !bufferList ) {
         ExtAudioFileDispose(audioFile);
         self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM 
@@ -192,7 +192,7 @@ static const int kMaxAudioFileReadSize = 16384;
         return;
     }
     
-    AudioBufferList *scratchBufferList = AEAllocateAndInitAudioBufferList(_targetAudioDescription, 0);
+    AudioBufferList *scratchBufferList = AEAllocateAndInitAudioBufferList_iOS5(_targetAudioDescription, 0);
     
     // Perform read in multiple small chunks (otherwise ExtAudioFileRead crashes when performing sample rate conversion)
     UInt64 readFrames = 0;
@@ -237,7 +237,7 @@ static const int kMaxAudioFileReadSize = 16384;
     }
     
     if ( _audioReceiverBlock ) {
-        AEFreeAudioBufferList(bufferList);
+        AEFreeAudioBufferList_iOS5(bufferList);
         bufferList = NULL;
     }
     

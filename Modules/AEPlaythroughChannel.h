@@ -40,7 +40,7 @@ extern "C" {
  *
  * @param audioController The Audio Controller
  */
-- (id)initWithAudioController:(AEAudioController*)audioController;
+- (id)initWithAudioController:(AEAudioController_iOS5*)audioController;
 
 @property (nonatomic, assign) float volume;
 @property (nonatomic, assign) float pan;

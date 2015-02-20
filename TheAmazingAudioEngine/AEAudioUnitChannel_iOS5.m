@@ -23,7 +23,7 @@
 //  3. This notice may not be removed or altered from any source distribution.
 //
 
-#import "AEAudioUnitChannel.h"
+#import "AEAudioUnitChannel_iOS5.h"
 
 #define checkResult(result,operation) (_checkResult((result),(operation),strrchr(__FILE__, '/')+1,__LINE__))
 static inline BOOL _checkResult(OSStatus result, const char *operation, const char* file, int line) {
@@ -35,8 +35,8 @@ static inline BOOL _checkResult(OSStatus result, const char *operation, const ch
     return YES;
 }
 
-@interface AEAudioUnitChannel () {
-    AEAudioController *_audioController;
+@interface AEAudioUnitChannel_iOS5 () {
+    AEAudioController_iOS5 *_audioController;
     AudioComponentDescription _componentDescription;
     AUNode _node;
     AudioUnit _audioUnit;
@@ -46,16 +46,16 @@ static inline BOOL _checkResult(OSStatus result, const char *operation, const ch
 }
 @end
 
-@implementation AEAudioUnitChannel
+@implementation AEAudioUnitChannel_iOS5
 
 - (id)initWithComponentDescription:(AudioComponentDescription)audioComponentDescription
-                       audioController:(AEAudioController*)audioController
+                       audioController:(AEAudioController_iOS5*)audioController
                                  error:(NSError**)error {
     return [self initWithComponentDescription:audioComponentDescription audioController:audioController  preInitializeBlock:nil error:error];
 }
 
 - (id)initWithComponentDescription:(AudioComponentDescription)audioComponentDescription
-                   audioController:(AEAudioController*)audioController
+                   audioController:(AEAudioController_iOS5*)audioController
                 preInitializeBlock:(void(^)(AudioUnit audioUnit))block
                              error:(NSError**)error {
     
@@ -76,7 +76,7 @@ static inline BOOL _checkResult(OSStatus result, const char *operation, const ch
     self.channelIsMuted = NO;
     self.channelIsPlaying = YES;
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didRecreateGraph:) name:AEAudioControllerDidRecreateGraphNotification object:_audioController];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didRecreateGraph:) name:AEAudioController_iOS5DidRecreateGraphNotification object:_audioController];
     
     return self;
 }
@@ -101,13 +101,13 @@ static inline BOOL _checkResult(OSStatus result, const char *operation, const ch
         UInt32 size = sizeof(defaultAudioDescription);
         AudioUnitGetProperty(_audioUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &defaultAudioDescription, &size);
         defaultAudioDescription.mSampleRate = audioDescription.mSampleRate;
-        AEAudioStreamBasicDescriptionSetChannelsPerFrame(&defaultAudioDescription, audioDescription.mChannelsPerFrame);
+        AEAudioStreamBasicDescriptionSetChannelsPerFrame_iOS5(&defaultAudioDescription, audioDescription.mChannelsPerFrame);
         if ( !checkResult(result=AudioUnitSetProperty(_audioUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &defaultAudioDescription, size), "AudioUnitSetProperty") ) {
             if ( error ) *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:result userInfo:[NSDictionary dictionaryWithObject:@"Incompatible audio format" forKey:NSLocalizedDescriptionKey]];
             return NO;
         }
         
-        AudioComponentDescription audioConverterDescription = AEAudioComponentDescriptionMake(kAudioUnitManufacturer_Apple, kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
+        AudioComponentDescription audioConverterDescription = AEAudioComponentDescriptionMake_iOS5(kAudioUnitManufacturer_Apple, kAudioUnitType_FormatConverter, kAudioUnitSubType_AUConverter);
         if ( !checkResult(result=AUGraphAddNode(_audioGraph, &audioConverterDescription, &_converterNode), "AUGraphAddNode") ||
              !checkResult(result=AUGraphNodeInfo(_audioGraph, _converterNode, NULL, &_converterUnit), "AUGraphNodeInfo") ||
              !checkResult(result=AudioUnitSetProperty(_converterUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 0, &defaultAudioDescription, sizeof(AudioStreamBasicDescription)), "AudioUnitSetProperty(kAudioUnitProperty_StreamFormat)") ||
@@ -139,7 +139,7 @@ static inline BOOL _checkResult(OSStatus result, const char *operation, const ch
 }
 
 -(void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:AEAudioControllerDidRecreateGraphNotification object:_audioController];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:AEAudioController_iOS5DidRecreateGraphNotification object:_audioController];
     
     if ( _node ) {
         checkResult(AUGraphRemoveNode(_audioGraph, _node), "AUGraphRemoveNode");
@@ -162,17 +162,17 @@ static inline BOOL _checkResult(OSStatus result, const char *operation, const ch
 }
 
 static OSStatus renderCallback(id                        channel,
-                               AEAudioController        *audioController,
+                               AEAudioController_iOS5        *audioController,
                                const AudioTimeStamp     *time,
                                UInt32                    frames,
                                AudioBufferList          *audio) {
-    AEAudioUnitChannel *THIS = (AEAudioUnitChannel*)channel;
+    AEAudioUnitChannel_iOS5 *THIS = (AEAudioUnitChannel_iOS5*)channel;
     AudioUnitRenderActionFlags flags = 0;
     checkResult(AudioUnitRender(THIS->_converterUnit ? THIS->_converterUnit : THIS->_audioUnit, &flags, time, 0, frames, audio), "AudioUnitRender");
     return noErr;
 }
 
--(AEAudioControllerRenderCallback)renderCallback {
+-(AEAudioController_iOS5RenderCallback)renderCallback {
     return renderCallback;
 }
 

@@ -48,12 +48,12 @@ NSString * kAERecorderErrorKey = @"error";
     return [AEAudioFileWriter AACEncodingAvailable];
 }
 
-- (id)initWithAudioController:(AEAudioController*)audioController {
+- (id)initWithAudioController:(AEAudioController_iOS5*)audioController {
     if ( !(self = [super init]) ) return nil;
     self.mixer = [[[AEMixerBuffer alloc] initWithClientFormat:audioController.audioDescription] autorelease];
     self.writer = [[[AEAudioFileWriter alloc] initWithAudioDescription:audioController.audioDescription] autorelease];
     if ( audioController.audioInputAvailable && audioController.inputAudioDescription.mChannelsPerFrame != audioController.audioDescription.mChannelsPerFrame ) {
-        [_mixer setAudioDescription:*AEAudioControllerInputAudioDescription(audioController) forSource:AEAudioSourceInput];
+        [_mixer setAudioDescription:*AEAudioController_iOS5InputAudioDescription(audioController) forSource:AEAudioSourceInput];
     }
     _buffer = AEAllocateAndInitAudioBufferList(audioController.audioDescription, 0);
     
@@ -93,7 +93,7 @@ void AERecorderStartRecording(AERecorder* THIS) {
 }
 
 struct reportError_t { AERecorder *THIS; OSStatus result; };
-static void reportError(AEAudioController *audioController, void *userInfo, int length) {
+static void reportError(AEAudioController_iOS5 *audioController, void *userInfo, int length) {
     struct reportError_t *arg = userInfo;
     NSError *error = [NSError errorWithDomain:NSOSStatusErrorDomain 
                                          code:arg->result
@@ -105,7 +105,7 @@ static void reportError(AEAudioController *audioController, void *userInfo, int 
 }
 
 static void audioCallback(id                        receiver,
-                          AEAudioController        *audioController,
+                          AEAudioController_iOS5        *audioController,
                           void                     *source,
                           const AudioTimeStamp     *time,
                           UInt32                    frames,
@@ -122,14 +122,14 @@ static void audioCallback(id                        receiver,
         THIS->_buffer->mBuffers[i].mDataByteSize = 0;
     }
     
-    THIS->_currentTime += AEConvertFramesToSeconds(audioController, frames);
+    THIS->_currentTime += AEConvertFramesToSeconds_iOS5(audioController, frames);
     
     AEMixerBufferDequeue(THIS->_mixer, THIS->_buffer, &bufferLength, NULL);
     
     if ( bufferLength > 0 ) {
         OSStatus status = AEAudioFileWriterAddAudio(THIS->_writer, THIS->_buffer, bufferLength);
         if ( status != noErr ) {
-            AEAudioControllerSendAsynchronousMessageToMainThread(audioController, 
+            AEAudioController_iOS5SendAsynchronousMessageToMainThread(audioController, 
                                                                  reportError, 
                                                                  &(struct reportError_t) { .THIS = THIS, .result = status }, 
                                                                  sizeof(struct reportError_t));
@@ -137,7 +137,7 @@ static void audioCallback(id                        receiver,
     }
 }
 
--(AEAudioControllerAudioCallback)receiverCallback {
+-(AEAudioController_iOS5AudioCallback)receiverCallback {
     return audioCallback;
 }
 

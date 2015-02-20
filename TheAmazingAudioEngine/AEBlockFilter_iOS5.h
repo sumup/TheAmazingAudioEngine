@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 #import <Foundation/Foundation.h>
-#import "TheAmazingAudioEngine.h"
+#import "TheAmazingAudioEngine_iOS5.h"
 
 /*!
  * Filter processing block
@@ -48,7 +48,7 @@ extern "C" {
  * @param frames    The length of the required audio, in frames
  * @param audio     The audio buffer list to write output audio to
  */
-typedef void (^AEBlockFilterBlock)(AEAudioControllerFilterProducer producer,
+typedef void (^AEBlockFilterBlock)(AEAudioController_iOS5FilterProducer producer,
                                    void                     *producerToken,
                                    const AudioTimeStamp     *time,
                                    UInt32                    frames,
@@ -57,14 +57,14 @@ typedef void (^AEBlockFilterBlock)(AEAudioControllerFilterProducer producer,
 /*!
  * Block filter: Utility class to allow use of a block to filter audio
  */
-@interface AEBlockFilter : NSObject <AEAudioFilter>
+@interface AEBlockFilter_iOS5 : NSObject <AEAudioFilter>
 
 /*!
  * Create a new filter with a given block
  *
  * @param block Block to use for audio generation
  */
-+ (AEBlockFilter*)filterWithBlock:(AEBlockFilterBlock)block;
++ (AEBlockFilter_iOS5*)filterWithBlock:(AEBlockFilterBlock)block;
 
 /*
  * The audio format for this filter

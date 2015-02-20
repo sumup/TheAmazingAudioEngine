@@ -24,7 +24,7 @@
 //
 
 #import "AEAudioFilePlayer.h"
-#import "AEAudioFileLoaderOperation.h"
+#import "AEAudioFileLoaderOperation_iOS5.h"
 #import <libkern/OSAtomic.h>
 
 #define checkStatus(status) \
@@ -32,7 +32,7 @@
         NSLog(@"Error: %ld -> %s:%d", (status), __FILE__, __LINE__);\
     }
 
-@interface AEAudioFilePlayer () {
+@interface AEAudioFilePlayer_iOS5 () {
     AudioBufferList              *_audio;
     UInt32                        _lengthInFrames;
     AudioStreamBasicDescription   _audioDescription;
@@ -41,19 +41,19 @@
 @property (nonatomic, retain, readwrite) NSURL *url;
 @end
 
-@implementation AEAudioFilePlayer
+@implementation AEAudioFilePlayer_iOS5
 @synthesize url = _url, loop=_loop, volume=_volume, pan=_pan, channelIsPlaying=_channelIsPlaying, channelIsMuted=_channelIsMuted, removeUponFinish=_removeUponFinish, completionBlock = _completionBlock, startLoopBlock = _startLoopBlock;
 @dynamic duration, currentTime;
 
-+ (id)audioFilePlayerWithURL:(NSURL*)url audioController:(AEAudioController *)audioController error:(NSError **)error {
++ (id)audioFilePlayerWithURL:(NSURL*)url audioController:(AEAudioController_iOS5 *)audioController error:(NSError **)error {
     
-    AEAudioFilePlayer *player = [[[self alloc] init] autorelease];
+    AEAudioFilePlayer_iOS5 *player = [[[self alloc] init] autorelease];
     player->_volume = 1.0;
     player->_channelIsPlaying = YES;
     player->_audioDescription = audioController.audioDescription;
     player.url = url;
     
-    AEAudioFileLoaderOperation *operation = [[AEAudioFileLoaderOperation alloc] initWithFileURL:url targetAudioDescription:player->_audioDescription];
+    AEAudioFileLoaderOperation_iOS5 *operation = [[AEAudioFileLoaderOperation_iOS5 alloc] initWithFileURL:url targetAudioDescription:player->_audioDescription];
     [operation start];
     
     if ( operation.error ) {
@@ -96,14 +96,14 @@
     _playhead = (int32_t)((currentTime / [self duration]) * _lengthInFrames) % _lengthInFrames;
 }
 
-static void notifyLoopRestart(AEAudioController *audioController, void *userInfo, int length) {
-    AEAudioFilePlayer *THIS = *(AEAudioFilePlayer**)userInfo;
+static void notifyLoopRestart(AEAudioController_iOS5 *audioController, void *userInfo, int length) {
+    AEAudioFilePlayer_iOS5 *THIS = *(AEAudioFilePlayer_iOS5**)userInfo;
     
     if ( THIS.startLoopBlock ) THIS.startLoopBlock();
 }
 
-static void notifyPlaybackStopped(AEAudioController *audioController, void *userInfo, int length) {
-    AEAudioFilePlayer *THIS = *(AEAudioFilePlayer**)userInfo;
+static void notifyPlaybackStopped(AEAudioController_iOS5 *audioController, void *userInfo, int length) {
+    AEAudioFilePlayer_iOS5 *THIS = *(AEAudioFilePlayer_iOS5**)userInfo;
     THIS.channelIsPlaying = NO;
 
     if ( THIS->_removeUponFinish ) {
@@ -115,7 +115,7 @@ static void notifyPlaybackStopped(AEAudioController *audioController, void *user
     THIS->_playhead = 0;
 }
 
-static OSStatus renderCallback(AEAudioFilePlayer *THIS, AEAudioController *audioController, const AudioTimeStamp *time, UInt32 frames, AudioBufferList *audio) {
+static OSStatus renderCallback(AEAudioFilePlayer_iOS5 *THIS, AEAudioController_iOS5 *audioController, const AudioTimeStamp *time, UInt32 frames, AudioBufferList *audio) {
     int32_t playhead = THIS->_playhead;
     int32_t originalPlayhead = playhead;
     
@@ -123,7 +123,7 @@ static OSStatus renderCallback(AEAudioFilePlayer *THIS, AEAudioController *audio
     
     if ( !THIS->_loop && playhead == THIS->_lengthInFrames ) {
         // Notify main thread that playback has finished
-        AEAudioControllerSendAsynchronousMessageToMainThread(audioController, notifyPlaybackStopped, &THIS, sizeof(AEAudioFilePlayer*));
+        AEAudioController_iOS5SendAsynchronousMessageToMainThread(audioController, notifyPlaybackStopped, &THIS, sizeof(AEAudioFilePlayer_iOS5*));
         THIS->_channelIsPlaying = NO;
         return noErr;
     }
@@ -160,11 +160,11 @@ static OSStatus renderCallback(AEAudioFilePlayer *THIS, AEAudioController *audio
                 playhead = 0;
                 if ( THIS->_startLoopBlock ) {
                     // Notify main thread that the loop playback has restarted
-                    AEAudioControllerSendAsynchronousMessageToMainThread(audioController, notifyLoopRestart, &THIS, sizeof(AEAudioFilePlayer*));
+                    AEAudioController_iOS5SendAsynchronousMessageToMainThread(audioController, notifyLoopRestart, &THIS, sizeof(AEAudioFilePlayer_iOS5*));
                 }
             } else {
                 // Notify main thread that playback has finished
-                AEAudioControllerSendAsynchronousMessageToMainThread(audioController, notifyPlaybackStopped, &THIS, sizeof(AEAudioFilePlayer*));
+                AEAudioController_iOS5SendAsynchronousMessageToMainThread(audioController, notifyPlaybackStopped, &THIS, sizeof(AEAudioFilePlayer_iOS5*));
                 THIS->_channelIsPlaying = NO;
                 break;
             }
@@ -176,7 +176,7 @@ static OSStatus renderCallback(AEAudioFilePlayer *THIS, AEAudioController *audio
     return noErr;
 }
 
--(AEAudioControllerRenderCallback)renderCallback {
+-(AEAudioController_iOS5RenderCallback)renderCallback {
     return &renderCallback;
 }
 

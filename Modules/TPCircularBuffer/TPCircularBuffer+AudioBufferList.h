@@ -43,7 +43,7 @@ typedef struct {
     AudioTimeStamp timestamp;
     UInt32 totalLength;
     AudioBufferList bufferList;
-} TPCircularBufferABLBlockHeader;
+} TPCircularBufferABLBlockHeader_iOS5;
 
     
 /*!
@@ -55,7 +55,7 @@ typedef struct {
  * @param timestamp         The timestamp associated with the buffer, or NULL. Note that you can also pass a timestamp into TPCircularBufferProduceAudioBufferList, to set it there instead.
  * @return The empty buffer list, or NULL if circular buffer has insufficient space
  */
-AudioBufferList *TPCircularBufferPrepareEmptyAudioBufferList(TPCircularBuffer *buffer, int numberOfBuffers, int bytesPerBuffer, const AudioTimeStamp *timestamp);
+AudioBufferList *TPCircularBufferPrepareEmptyAudioBufferList_iOS5(TPCircularBuffer_iOS5 *buffer, int numberOfBuffers, int bytesPerBuffer, const AudioTimeStamp *timestamp);
 
 /*!
  * Prepare an empty buffer list, stored on the circular buffer, using an audio description to automatically configure buffer
@@ -66,7 +66,7 @@ AudioBufferList *TPCircularBufferPrepareEmptyAudioBufferList(TPCircularBuffer *b
  * @param timestamp         The timestamp associated with the buffer, or NULL. Note that you can also pass a timestamp into TPCircularBufferProduceAudioBufferList, to set it there instead.
  * @return The empty buffer list, or NULL if circular buffer has insufficient space
  */
-AudioBufferList *TPCircularBufferPrepareEmptyAudioBufferListWithAudioFormat(TPCircularBuffer *buffer, AudioStreamBasicDescription *audioFormat, UInt32 frameCount, const AudioTimeStamp *timestamp);
+AudioBufferList *TPCircularBufferPrepareEmptyAudioBufferListWithAudioFormat_iOS5(TPCircularBuffer_iOS5 *buffer, AudioStreamBasicDescription *audioFormat, UInt32 frameCount, const AudioTimeStamp *timestamp);
 
 /*!
  * Mark next audio buffer list as ready for reading
@@ -78,7 +78,7 @@ AudioBufferList *TPCircularBufferPrepareEmptyAudioBufferListWithAudioFormat(TPCi
  * @param buffer            Circular buffer
  * @param timestamp         The timestamp associated with the buffer, or NULL to leave as-is. Note that you can also pass a timestamp into TPCircularBufferPrepareEmptyAudioBufferList, to set it there instead.
  */
-void TPCircularBufferProduceAudioBufferList(TPCircularBuffer *buffer, const AudioTimeStamp *inTimestamp);
+void TPCircularBufferProduceAudioBufferList_iOS5(TPCircularBuffer_iOS5 *buffer, const AudioTimeStamp *inTimestamp);
 
 /*!
  * Copy the audio buffer list onto the buffer
@@ -86,11 +86,11 @@ void TPCircularBufferProduceAudioBufferList(TPCircularBuffer *buffer, const Audi
  * @param buffer            Circular buffer
  * @param bufferList        Buffer list containing audio to copy to buffer
  * @param timestamp         The timestamp associated with the buffer, or NULL
- * @param frames            Length of audio in frames. Specify kTPCircularBufferCopyAll to copy the whole buffer (audioFormat can be NULL, in this case)
+ * @param frames            Length of audio in frames. Specify kTPCircularBufferCopyAll to copy the whole buffer _iOS5(audioFormat can be NULL, in this case)
  * @param audioFormat       The AudioStreamBasicDescription describing the audio, or NULL if you specify kTPCircularBufferCopyAll to the `frames` argument
  * @return YES if buffer list was successfully copied; NO if there was insufficient space
  */
-bool TPCircularBufferCopyAudioBufferList(TPCircularBuffer *buffer, const AudioBufferList *bufferList, const AudioTimeStamp *timestamp, UInt32 frames, const AudioStreamBasicDescription *audioFormat);
+bool TPCircularBufferCopyAudioBufferList_iOS5(TPCircularBuffer_iOS5 *buffer, const AudioBufferList *bufferList, const AudioTimeStamp *timestamp, UInt32 frames, const AudioStreamBasicDescription *audioFormat);
 
 /*!
  * Get a pointer to the next stored buffer list
@@ -99,9 +99,9 @@ bool TPCircularBufferCopyAudioBufferList(TPCircularBuffer *buffer, const AudioBu
  * @param outTimestamp      On output, if not NULL, the timestamp corresponding to the buffer
  * @return Pointer to the next buffer list in the buffer
  */
-static __inline__ __attribute__((always_inline)) AudioBufferList *TPCircularBufferNextBufferList(TPCircularBuffer *buffer, AudioTimeStamp *outTimestamp) {
+static __inline__ __attribute__((always_inline)) AudioBufferList *TPCircularBufferNextBufferList_iOS5(TPCircularBuffer_iOS5 *buffer, AudioTimeStamp *outTimestamp) {
     int32_t dontcare; // Length of segment is contained within buffer list, so we can ignore this
-    TPCircularBufferABLBlockHeader *block = TPCircularBufferTail(buffer, &dontcare);
+    TPCircularBufferABLBlockHeader_iOS5 *block = TPCircularBufferTail_iOS5(buffer, &dontcare);
     if ( !block ) {
         if ( outTimestamp ) {
             memset(outTimestamp, 0, sizeof(AudioTimeStamp));
@@ -122,18 +122,18 @@ static __inline__ __attribute__((always_inline)) AudioBufferList *TPCircularBuff
  * @param outTimestamp      On output, if not NULL, the timestamp corresponding to the buffer
  * @return Pointer to the next buffer list in the buffer, or NULL
  */
-AudioBufferList *TPCircularBufferNextBufferListAfter(TPCircularBuffer *buffer, AudioBufferList *bufferList, AudioTimeStamp *outTimestamp);
+AudioBufferList *TPCircularBufferNextBufferListAfter_iOS5(TPCircularBuffer_iOS5 *buffer, AudioBufferList *bufferList, AudioTimeStamp *outTimestamp);
 
 /*!
  * Consume the next buffer list
  *
  * @param buffer Circular buffer
  */
-static __inline__ __attribute__((always_inline)) void TPCircularBufferConsumeNextBufferList(TPCircularBuffer *buffer) {
+static __inline__ __attribute__((always_inline)) void TPCircularBufferConsumeNextBufferList_iOS5(TPCircularBuffer_iOS5 *buffer) {
     int32_t dontcare;
-    TPCircularBufferABLBlockHeader *block = TPCircularBufferTail(buffer, &dontcare);
+    TPCircularBufferABLBlockHeader_iOS5 *block = TPCircularBufferTail_iOS5(buffer, &dontcare);
     if ( !block ) return;
-    TPCircularBufferConsume(buffer, block->totalLength);
+    TPCircularBufferConsume_iOS5(buffer, block->totalLength);
 }
 
 /*!
@@ -146,7 +146,7 @@ static __inline__ __attribute__((always_inline)) void TPCircularBufferConsumeNex
  * @param framesToConsume The number of frames to consume from the buffer list
  * @param audioFormat The AudioStreamBasicDescription describing the audio
  */
-void TPCircularBufferConsumeNextBufferListPartial(TPCircularBuffer *buffer, int framesToConsume, const AudioStreamBasicDescription *audioFormat);
+void TPCircularBufferConsumeNextBufferListPartial_iOS5(TPCircularBuffer_iOS5 *buffer, int framesToConsume, const AudioStreamBasicDescription *audioFormat);
 
 /*!
  * Consume a certain number of frames from the buffer, possibly from multiple queued buffer lists
@@ -162,7 +162,7 @@ void TPCircularBufferConsumeNextBufferListPartial(TPCircularBuffer *buffer, int 
  * @param outTimestamp      On output, if not NULL, the timestamp corresponding to the first audio frame returned
  * @param audioFormat       The format of the audio stored in the buffer
  */
-void TPCircularBufferDequeueBufferListFrames(TPCircularBuffer *buffer, UInt32 *ioLengthInFrames, AudioBufferList *outputBufferList, AudioTimeStamp *outTimestamp, const AudioStreamBasicDescription *audioFormat);
+void TPCircularBufferDequeueBufferListFrames_iOS5(TPCircularBuffer_iOS5 *buffer, UInt32 *ioLengthInFrames, AudioBufferList *outputBufferList, AudioTimeStamp *outTimestamp, const AudioStreamBasicDescription *audioFormat);
 
 /*!
  * Determine how many frames of audio are buffered
@@ -176,7 +176,7 @@ void TPCircularBufferDequeueBufferListFrames(TPCircularBuffer *buffer, UInt32 *i
  * @param audioFormat       The format of the audio stored in the buffer
  * @return The number of frames in the given audio format that are in the buffer
  */
-UInt32 TPCircularBufferPeek(TPCircularBuffer *buffer, AudioTimeStamp *outTimestamp, const AudioStreamBasicDescription *audioFormat);
+UInt32 TPCircularBufferPeek_iOS5(TPCircularBuffer_iOS5 *buffer, AudioTimeStamp *outTimestamp, const AudioStreamBasicDescription *audioFormat);
 
 /*!
  * Determine how many contiguous frames of audio are buffered
@@ -192,7 +192,7 @@ UInt32 TPCircularBufferPeek(TPCircularBuffer *buffer, AudioTimeStamp *outTimesta
  * @param contiguousToleranceSampleTime The number of samples of discrepancy to tolerate
  * @return The number of frames in the given audio format that are in the buffer
  */
-UInt32 TPCircularBufferPeekContiguous(TPCircularBuffer *buffer, AudioTimeStamp *outTimestamp, const AudioStreamBasicDescription *audioFormat, UInt32 contiguousToleranceSampleTime);
+UInt32 TPCircularBufferPeekContiguous_iOS5(TPCircularBuffer_iOS5 *buffer, AudioTimeStamp *outTimestamp, const AudioStreamBasicDescription *audioFormat, UInt32 contiguousToleranceSampleTime);
 
 /*!
  * Determine how many much space there is in the buffer
@@ -205,10 +205,10 @@ UInt32 TPCircularBufferPeekContiguous(TPCircularBuffer *buffer, AudioTimeStamp *
  * @param audioFormat       The format of the audio stored in the buffer
  * @return The number of frames in the given audio format that can be stored in the buffer
  */
-static __inline__ __attribute__((always_inline)) UInt32 TPCircularBufferGetAvailableSpace(TPCircularBuffer *buffer, const AudioStreamBasicDescription *audioFormat) {
+static __inline__ __attribute__((always_inline)) UInt32 TPCircularBufferGetAvailableSpace_iOS5(TPCircularBuffer_iOS5 *buffer, const AudioStreamBasicDescription *audioFormat) {
     int32_t availableBytes;
-    TPCircularBufferHead(buffer, &availableBytes);
-    size_t blockSize = sizeof(TPCircularBufferABLBlockHeader)
+    TPCircularBufferHead_iOS5(buffer, &availableBytes);
+    size_t blockSize = sizeof(TPCircularBufferABLBlockHeader_iOS5)
                             + (sizeof(AudioBuffer) * (audioFormat->mFormatFlags & kAudioFormatFlagIsNonInterleaved ? audioFormat->mChannelsPerFrame-1 : 0));
     if ( availableBytes <= blockSize ) return 0;
     return (UInt32)(availableBytes-blockSize) / (audioFormat->mBytesPerFrame * (audioFormat->mFormatFlags & kAudioFormatFlagIsNonInterleaved ? audioFormat->mChannelsPerFrame : 1));

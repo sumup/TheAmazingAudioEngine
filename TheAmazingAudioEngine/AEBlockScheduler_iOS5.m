@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 A Tasty Pixel. All rights reserved.
 //
 
-#import "AEBlockScheduler.h"
+#import "AEBlockScheduler_iOS5.h"
 #import <libkern/OSAtomic.h>
 #import <mach/mach_time.h>
 
@@ -15,11 +15,11 @@ static double __secondsToHostTicks = 0.0;
 
 const int kMaximumSchedules = 100;
 
-NSString const * AEBlockSchedulerKeyBlock = @"block";
-NSString const * AEBlockSchedulerKeyTimestampInHostTicks = @"time";
-NSString const * AEBlockSchedulerKeyResponseBlock = @"response";
-NSString const * AEBlockSchedulerKeyIdentifier = @"identifier";
-NSString const * AEBlockSchedulerKeyTimingContext = @"context";
+NSString const * AEBlockSchedulerKeyBlock_iOS5 = @"block";
+NSString const * AEBlockSchedulerKeyTimestampInHostTicks_iOS5 = @"time";
+NSString const * AEBlockSchedulerKeyResponseBlock_iOS5 = @"response";
+NSString const * AEBlockSchedulerKeyIdentifier_iOS5 = @"identifier";
+NSString const * AEBlockSchedulerKeyTimingContext_iOS5 = @"context";
 
 struct _schedule_t {
     AEBlockSchedulerBlock block;
@@ -29,16 +29,16 @@ struct _schedule_t {
     id identifier;
 };
 
-@interface AEBlockScheduler () {
+@interface AEBlockScheduler_iOS5 () {
     struct _schedule_t _schedule[kMaximumSchedules];
     int _head;
     int _tail;
 }
 @property (nonatomic, retain) NSMutableArray *scheduledIdentifiers;
-@property (nonatomic, assign) AEAudioController *audioController;
+@property (nonatomic, assign) AEAudioController_iOS5 *audioController;
 @end
 
-@implementation AEBlockScheduler
+@implementation AEBlockScheduler_iOS5
 @synthesize scheduledIdentifiers = _scheduledIdentifiers;
 
 +(void)initialize {
@@ -73,7 +73,7 @@ struct _schedule_t {
     return (timeStamp + (seconds * __secondsToHostTicks));
 }
 
-- (id)initWithAudioController:(AEAudioController *)audioController {
+- (id)initWithAudioController:(AEAudioController_iOS5 *)audioController {
     if ( !(self = [super init]) ) return nil;
     
     self.audioController = audioController;
@@ -172,11 +172,11 @@ struct _schedule_t {
     if ( !schedule ) return nil;
     
     return [NSDictionary dictionaryWithObjectsAndKeys:
-            schedule->block, AEBlockSchedulerKeyBlock,
-            schedule->identifier, AEBlockSchedulerKeyIdentifier,
-            schedule->responseBlock ? (id)schedule->responseBlock : [NSNull null], AEBlockSchedulerKeyResponseBlock,
-            [NSNumber numberWithLongLong:schedule->time], AEBlockSchedulerKeyTimestampInHostTicks,
-            [NSNumber numberWithInt:schedule->context], AEBlockSchedulerKeyTimingContext,
+            schedule->block, AEBlockSchedulerKeyBlock_iOS5,
+            schedule->identifier, AEBlockSchedulerKeyIdentifier_iOS5,
+            schedule->responseBlock ? (id)schedule->responseBlock : [NSNull null], AEBlockSchedulerKeyResponseBlock_iOS5,
+            [NSNumber numberWithLongLong:schedule->time], AEBlockSchedulerKeyTimestampInHostTicks_iOS5,
+            [NSNumber numberWithInt:schedule->context], AEBlockSchedulerKeyTimingContext_iOS5,
             nil];
 }
 
@@ -189,8 +189,8 @@ struct _schedule_t {
     return NULL;
 }
 
-struct _timingReceiverFinishSchedule_t { struct _schedule_t schedule; AEBlockScheduler *THIS; };
-static void timingReceiverFinishSchedule(AEAudioController *audioController, void *userInfo, int len) {
+struct _timingReceiverFinishSchedule_t { struct _schedule_t schedule; AEBlockScheduler_iOS5 *THIS; };
+static void timingReceiverFinishSchedule(AEAudioController_iOS5 *audioController, void *userInfo, int len) {
     struct _timingReceiverFinishSchedule_t *arg = (struct _timingReceiverFinishSchedule_t*)userInfo;
     
     if ( arg->schedule.responseBlock ) {
@@ -205,18 +205,18 @@ static void timingReceiverFinishSchedule(AEAudioController *audioController, voi
 }
 
 static void timingReceiver(id                        receiver,
-                           AEAudioController        *audioController,
+                           AEAudioController_iOS5        *audioController,
                            const AudioTimeStamp     *time,
                            UInt32 const              frames,
                            AEAudioTimingContext      context) {
-    AEBlockScheduler *THIS = receiver;
-    uint64_t endTime = time->mHostTime + AEConvertFramesToSeconds(audioController, frames)*__secondsToHostTicks;
+    AEBlockScheduler_iOS5 *THIS = receiver;
+    uint64_t endTime = time->mHostTime + AEConvertFramesToSeconds_iOS5(audioController, frames)*__secondsToHostTicks;
     
     for ( int i=THIS->_tail; i != THIS->_head; i=(i+1)%kMaximumSchedules ) {
         if ( THIS->_schedule[i].block && THIS->_schedule[i].context == context && THIS->_schedule[i].time && endTime >= THIS->_schedule[i].time ) {
-            UInt32 offset = THIS->_schedule[i].time > time->mHostTime ? (UInt32)AEConvertSecondsToFrames(audioController, (THIS->_schedule[i].time - time->mHostTime)*__hostTicksToSeconds) : 0;
+            UInt32 offset = THIS->_schedule[i].time > time->mHostTime ? (UInt32)AEConvertSecondsToFrames_iOS5(audioController, (THIS->_schedule[i].time - time->mHostTime)*__hostTicksToSeconds) : 0;
             THIS->_schedule[i].block(time, offset);
-            AEAudioControllerSendAsynchronousMessageToMainThread(audioController,
+            AEAudioController_iOS5SendAsynchronousMessageToMainThread(audioController,
                                                                  timingReceiverFinishSchedule,
                                                                  &(struct _timingReceiverFinishSchedule_t) { .schedule = THIS->_schedule[i], .THIS = THIS },
                                                                  sizeof(struct _timingReceiverFinishSchedule_t));
@@ -230,7 +230,7 @@ static void timingReceiver(id                        receiver,
     }
 }
 
--(AEAudioControllerTimingCallback)timingReceiverCallback {
+-(AEAudioController_iOS5TimingCallback)timingReceiverCallback {
     return timingReceiver;
 }
 

@@ -39,7 +39,7 @@ extern "C" {
  * @param frameCount        The number of frames to allocate space for (or 0 to just allocate the list structure itself)
  * @return The allocated and initialised audio buffer list
  */
-AudioBufferList *AEAllocateAndInitAudioBufferList(AudioStreamBasicDescription audioFormat, int frameCount);
+AudioBufferList *AEAllocateAndInitAudioBufferList_iOS5(AudioStreamBasicDescription audioFormat, int frameCount);
 
 /*!
  * Create a copy of an audio buffer list
@@ -50,7 +50,7 @@ AudioBufferList *AEAllocateAndInitAudioBufferList(AudioStreamBasicDescription au
  * @param original          The original AudioBufferList to copy
  * @return The new, copied audio buffer list
  */
-AudioBufferList *AECopyAudioBufferList(AudioBufferList *original);
+AudioBufferList *AECopyAudioBufferList_iOS5(AudioBufferList *original);
     
 /*!
  * Free a buffer list and associated mData buffers
@@ -58,7 +58,7 @@ AudioBufferList *AECopyAudioBufferList(AudioBufferList *original);
  *  Note: Do not use this utility from within the Core Audio thread (such as inside a render
  *  callback). It may cause the thread to block, inducing audio stutters.
  */
-void AEFreeAudioBufferList(AudioBufferList *bufferList);
+void AEFreeAudioBufferList_iOS5(AudioBufferList *bufferList);
     
 /*!
  * Initialize a pre-allocated audio buffer list structure
@@ -82,7 +82,7 @@ void AEFreeAudioBufferList(AudioBufferList *bufferList);
  *                      broken up into even pieces, one for each channel.
  * @param dataSize      Size of 'data' buffer, in bytes.
  */
-void AEInitAudioBufferList(AudioBufferList *list, int listSize, AudioStreamBasicDescription audioFormat, void *data, int dataSize);
+void AEInitAudioBufferList_iOS5(AudioBufferList *list, int listSize, AudioStreamBasicDescription audioFormat, void *data, int dataSize);
 
 
 /*!
@@ -96,7 +96,7 @@ void AEInitAudioBufferList(AudioBufferList *list, int listSize, AudioStreamBasic
  * @param oNumberOfChannels If not NULL, will be set to the number of channels of audio in 'list'
  * @return Number of frames in the buffer list
  */
-int AEGetNumberOfFramesInAudioBufferList(AudioBufferList *list, AudioStreamBasicDescription audioFormat, int *oNumberOfChannels);
+int AEGetNumberOfFramesInAudioBufferList_iOS5(AudioBufferList *list, AudioStreamBasicDescription audioFormat, int *oNumberOfChannels);
 
 
 /*!
@@ -107,7 +107,7 @@ int AEGetNumberOfFramesInAudioBufferList(AudioBufferList *list, AudioStreamBasic
  * @param subtype       The subtype (e.g. kAudioUnitSubType_AudioFilePlayer)
  * @returns An AudioComponentDescription structure with the given attributes
  */
-AudioComponentDescription AEAudioComponentDescriptionMake(OSType manufacturer, OSType type, OSType subtype);
+AudioComponentDescription AEAudioComponentDescriptionMake_iOS5(OSType manufacturer, OSType type, OSType subtype);
     
 /*!
  * Assign a channel count to an AudioStreamBasicDescription
@@ -115,7 +115,7 @@ AudioComponentDescription AEAudioComponentDescriptionMake(OSType manufacturer, O
  *  This method ensures that the mBytesPerFrame/mBytesPerPacket value is updated
  *  correctly for interleaved audio.
  */
-void AEAudioStreamBasicDescriptionSetChannelsPerFrame(AudioStreamBasicDescription *audioDescription, int numberOfChannels);
+void AEAudioStreamBasicDescriptionSetChannelsPerFrame_iOS5(AudioStreamBasicDescription *audioDescription, int numberOfChannels);
 
 #ifdef __cplusplus
 }

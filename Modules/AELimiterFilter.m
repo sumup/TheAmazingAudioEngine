@@ -35,14 +35,14 @@ const int kScratchBufferLength = 8192;
 }
 @property (nonatomic, retain) AEFloatConverter *floatConverter;
 @property (nonatomic, retain) AELimiter *limiter;
-@property (nonatomic, assign) AEAudioController *audioController;
+@property (nonatomic, assign) AEAudioController_iOS5 *audioController;
 @end
 
 @implementation AELimiterFilter
 @synthesize floatConverter = _floatConverter, limiter = _limiter, clientFormat = _clientFormat, audioController = _audioController;
 @dynamic hold, attack, decay, level;
 
-- (id)initWithAudioController:(AEAudioController *)audioController {
+- (id)initWithAudioController:(AEAudioController_iOS5 *)audioController {
     if ( !(self = [super init]) ) return nil;
     
     self.audioController = audioController;
@@ -138,8 +138,8 @@ const int kScratchBufferLength = 8192;
 }
 
 static OSStatus filterCallback(id                        filter,
-                               AEAudioController        *audioController,
-                               AEAudioControllerFilterProducer producer,
+                               AEAudioController_iOS5        *audioController,
+                               AEAudioController_iOS5FilterProducer producer,
                                void                     *producerToken,
                                const AudioTimeStamp     *time,
                                UInt32                    frames,
@@ -165,7 +165,7 @@ static OSStatus filterCallback(id                        filter,
     return noErr;
 }
 
--(AEAudioControllerFilterCallback)filterCallback {
+-(AEAudioController_iOS5FilterCallback)filterCallback {
     return filterCallback;
 }
 

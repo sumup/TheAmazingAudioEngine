@@ -23,13 +23,13 @@
 //  3. This notice may not be removed or altered from any source distribution.
 //
 
-#import "AEBlockChannel.h"
+#import "AEBlockChannel_iOS5.h"
 
-@interface AEBlockChannel ()
+@interface AEBlockChannel_iOS5 ()
 @property (nonatomic, copy) AEBlockChannelBlock block;
 @end
 
-@implementation AEBlockChannel
+@implementation AEBlockChannel_iOS5
 @synthesize block = _block;
 
 - (id)initWithBlock:(AEBlockChannelBlock)block {
@@ -42,8 +42,8 @@
     return self;
 }
 
-+ (AEBlockChannel*)channelWithBlock:(AEBlockChannelBlock)block {
-    return [[[AEBlockChannel alloc] initWithBlock:block] autorelease];
++ (AEBlockChannel_iOS5*)channelWithBlock:(AEBlockChannelBlock)block {
+    return [[[AEBlockChannel_iOS5 alloc] initWithBlock:block] autorelease];
 }
 
 -(void)dealloc {
@@ -52,16 +52,16 @@
 }
 
 static OSStatus renderCallback(id                        channel,
-                               AEAudioController        *audioController,
+                               AEAudioController_iOS5   *audioController,
                                const AudioTimeStamp     *time,
                                UInt32                    frames,
                                AudioBufferList          *audio) {
-    AEBlockChannel *THIS = (AEBlockChannel*)channel;
+    AEBlockChannel_iOS5 *THIS = (AEBlockChannel_iOS5*)channel;
     THIS->_block(time, frames, audio);
     return noErr;
 }
 
--(AEAudioControllerRenderCallback)renderCallback {
+-(AEAudioController_iOS5RenderCallback)renderCallback {
     return renderCallback;
 }
 

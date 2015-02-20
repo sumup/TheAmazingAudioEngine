@@ -30,13 +30,13 @@ extern "C" {
 #import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>
 
-extern NSString * const AEAudioFileWriterErrorDomain;
+extern NSString * const AEAudioFileWriterErrorDomain_iOS5;
 
 enum {
     kAEAudioFileWriterFormatError
 };
 
-@class AEAudioController;
+@class AEAudioController_iOS5;
 
 /*!
  * Audio file writer
@@ -44,7 +44,7 @@ enum {
  *  Provides an easy-to-use interface to the ExtAudioFile API, allowing
  *  asynchronous, Core Audio thread-safe writing of arbitrary audio formats.
  */
-@interface AEAudioFileWriter : NSObject
+@interface AEAudioFileWriter_iOS5 : NSObject
 + (BOOL)AACEncodingAvailable;
 
 /*!
@@ -87,7 +87,7 @@ enum {
  * @param lengthInFrames The length of the audio in the buffer list, in frames
  * @return A status code; noErr on success
  */
-OSStatus AEAudioFileWriterAddAudio(AEAudioFileWriter* writer, AudioBufferList *bufferList, UInt32 lengthInFrames);
+OSStatus AEAudioFileWriterAddAudio(AEAudioFileWriter_iOS5* writer, AudioBufferList *bufferList, UInt32 lengthInFrames);
 
 /*!
  * Add audio to be written, synchronously
@@ -101,7 +101,7 @@ OSStatus AEAudioFileWriterAddAudio(AEAudioFileWriter* writer, AudioBufferList *b
  * @param lengthInFrames The length of the audio in the buffer list, in frames
  * @return A status code; noErr on success
  */
-OSStatus AEAudioFileWriterAddAudioSynchronously(AEAudioFileWriter* writer, AudioBufferList *bufferList, UInt32 lengthInFrames);
+OSStatus AEAudioFileWriterAddAudioSynchronously(AEAudioFileWriter_iOS5* writer, AudioBufferList *bufferList, UInt32 lengthInFrames);
 
 /*!
  * The path to the file being written

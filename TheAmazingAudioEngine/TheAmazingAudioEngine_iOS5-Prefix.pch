@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'AEAudioController_iOS5' target in the 'AEAudioController_iOS5' project
+//
+
+#ifdef __OBJC__
+    #import <Foundation/Foundation.h>
+#endif

@@ -55,7 +55,7 @@ typedef struct {
     AEMixerBufferSourcePeekCallback         peekCallback;
     AEMixerBufferSourceRenderCallback       renderCallback;
     void                                   *callbackUserinfo;
-    TPCircularBuffer                        buffer;
+    TPCircularBuffer_iOS5                        buffer;
     uint64_t                                lastAudioTimestamp;
     BOOL                                    synced;
     UInt32                                  consumedFramesInCurrentTimeSlice;
@@ -97,12 +97,12 @@ static const UInt32 kMaxMicrofadeDuration                   = 512;
     AUNode                      _mixerNode;
     AudioUnit                   _mixerUnit;
     AudioConverterRef           _audioConverter;
-    TPCircularBuffer            _audioConverterBuffer;
+    TPCircularBuffer_iOS5            _audioConverterBuffer;
     BOOL                        _audioConverterHasBuffer;
     uint8_t                    *_scratchBuffer;
     BOOL                        _graphReady;
     BOOL                        _automaticSingleSourceDequeueing;
-    TPCircularBuffer            _mainThreadActionBuffer;
+    TPCircularBuffer_iOS5            _mainThreadActionBuffer;
     NSTimer                    *_mainThreadActionPollTimer;
     float                      **_microfadeBuffer;
     int                          _configuredChannels;
@@ -143,7 +143,7 @@ static void prepareSkipFadeBufferForSource(AEMixerBuffer *THIS, source_t* source
     self.clientFormat = clientFormat;
     
     _sourceIdleThreshold = kSourceTimestampIdleThreshold;
-    TPCircularBufferInit(&_mainThreadActionBuffer, kActionBufferSize);
+    TPCircularBufferInit_iOS5(&_mainThreadActionBuffer, kActionBufferSize);
     _mainThreadActionPollTimer = [NSTimer scheduledTimerWithTimeInterval:kActionMainThreadPollDuration
                                                                   target:[[[AEMixerBufferPollProxy alloc] initWithMixerBuffer:self] autorelease]
                                                                 selector:@selector(pollActionBuffer) 
@@ -155,7 +155,7 @@ static void prepareSkipFadeBufferForSource(AEMixerBuffer *THIS, source_t* source
 
 - (void)dealloc {
     [_mainThreadActionPollTimer invalidate];
-    TPCircularBufferCleanup(&_mainThreadActionBuffer);
+    TPCircularBufferCleanup_iOS5(&_mainThreadActionBuffer);
     
     if ( _graph ) {
         checkResult(AUGraphClose(_graph), "AUGraphClose");
@@ -165,7 +165,7 @@ static void prepareSkipFadeBufferForSource(AEMixerBuffer *THIS, source_t* source
     if ( _audioConverter ) {
         checkResult(AudioConverterDispose(_audioConverter), "AudioConverterDispose");
         _audioConverter = NULL;
-        TPCircularBufferCleanup(&_audioConverterBuffer);
+        TPCircularBufferCleanup_iOS5(&_audioConverterBuffer);
     }
     
     self.floatConverter = nil;
@@ -173,7 +173,7 @@ static void prepareSkipFadeBufferForSource(AEMixerBuffer *THIS, source_t* source
     for ( int i=0; i<kMaxSources; i++ ) {
         if ( _table[i].source ) {
             if ( !_table[i].renderCallback ) {
-                TPCircularBufferCleanup(&_table[i].buffer);
+                TPCircularBufferCleanup_iOS5(&_table[i].buffer);
             }
             if ( _table[i].skipFadeBuffer ) {
                 for ( int j=0; j<_table[i].skipFadeBuffer->mNumberBuffers; j++ ) {
@@ -219,7 +219,7 @@ static void prepareSkipFadeBufferForSource(AEMixerBuffer *THIS, source_t* source
             prepareSkipFadeBufferForSource(self, source);
             
             if ( !source->renderCallback ) {
-                TPCircularBufferClear(&source->buffer);
+                TPCircularBufferClear_iOS5(&source->buffer);
             }
         }
     }
@@ -228,7 +228,7 @@ static void prepareSkipFadeBufferForSource(AEMixerBuffer *THIS, source_t* source
         checkResult(AudioConverterDispose(_audioConverter), "AudioConverterDispose");
         _audioConverter = NULL;
         _audioConverterHasBuffer = NO;
-        TPCircularBufferCleanup(&_audioConverterBuffer);
+        TPCircularBufferCleanup_iOS5(&_audioConverterBuffer);
     }
     
     if ( _mixerUnit ) {
@@ -251,7 +251,7 @@ static void prepareSkipFadeBufferForSource(AEMixerBuffer *THIS, source_t* source
             
             // Create the audio converter
             checkResult(AudioConverterNew(&_mixerOutputFormat, &_clientFormat, &_audioConverter), "AudioConverterNew");
-            TPCircularBufferInit(&_audioConverterBuffer, kConversionBufferLength);
+            TPCircularBufferInit_iOS5(&_audioConverterBuffer, kConversionBufferLength);
         } else {
             checkResult(result, "AudioUnitSetProperty(kAudioUnitProperty_StreamFormat)");
         }
@@ -271,7 +271,7 @@ void AEMixerBufferEnqueue(AEMixerBuffer *THIS, AEMixerBufferSource sourceID, Aud
         } else {
             dprintf(THIS, 3, "Enqueueing prepare for new source %p", sourceID);
             action_t action = {.action = prepareNewSource, .userInfo = sourceID};
-            TPCircularBufferProduceBytes(&THIS->_mainThreadActionBuffer, &action, sizeof(action));
+            TPCircularBufferProduceBytes(&THIS->_mainThreadActionBuffer, &action, sizeof_iOS5(action));
             return;
         }
     }
@@ -281,7 +281,7 @@ void AEMixerBufferEnqueue(AEMixerBuffer *THIS, AEMixerBufferSource sourceID, Aud
     assert(!source->renderCallback);
 
     AudioStreamBasicDescription audioDescription = source->audioDescription.mSampleRate ? source->audioDescription : THIS->_clientFormat;
-    if ( !TPCircularBufferCopyAudioBufferList(&source->buffer, audio, timestamp, lengthInFrames, &audioDescription) ) {
+    if ( !TPCircularBufferCopyAudioBufferList_iOS5(&source->buffer, audio, timestamp, lengthInFrames, &audioDescription) ) {
         dprintf(THIS, 0, "Out of buffer space");
     }
 }
@@ -300,7 +300,7 @@ void AEMixerBufferEnqueue(AEMixerBuffer *THIS, AEMixerBufferSource sourceID, Aud
         prepareSkipFadeBufferForSource(self, source);
         [self refreshMixingGraph];
     } else {
-        TPCircularBufferCleanup(&source->buffer);
+        TPCircularBufferCleanup_iOS5(&source->buffer);
     }
     
     source->renderCallback = renderCallback;
@@ -428,7 +428,7 @@ void AEMixerBufferDequeue(AEMixerBuffer *THIS, AudioBufferList *bufferList, UInt
     
         if ( THIS->_audioConverter ) {
             // Initialise output buffer (to receive audio in mixer format)
-            intermediateBufferList = TPCircularBufferPrepareEmptyAudioBufferListWithAudioFormat(&THIS->_audioConverterBuffer, &THIS->_mixerOutputFormat, frames, NULL);
+            intermediateBufferList = TPCircularBufferPrepareEmptyAudioBufferListWithAudioFormat_iOS5(&THIS->_audioConverterBuffer, &THIS->_mixerOutputFormat, frames, NULL);
             assert(intermediateBufferList != NULL);
             
             for ( int i=0; i<intermediateBufferList->mNumberBuffers; i++ ) {
@@ -559,7 +559,7 @@ void AEMixerBufferDequeueSingleSource(AEMixerBuffer *THIS, AEMixerBufferSource s
             if ( sourceFrameCount == AEMixerBufferSourceInactive ) sourceFrameCount = 0;
             
         } else {
-            sourceFrameCount = TPCircularBufferPeek(&source->buffer, &sourceTimestamp, &audioDescription);
+            sourceFrameCount = TPCircularBufferPeek_iOS5(&source->buffer, &sourceTimestamp, &audioDescription);
             dprintf(THIS, 3, "Source %p: %u frames @ %0.5lfs", source->source, (unsigned int)sourceFrameCount, sourceTimestamp.mHostTime*__hostTicksToSeconds);
         }
     }
@@ -613,7 +613,7 @@ void AEMixerBufferDequeueSingleSource(AEMixerBuffer *THIS, AEMixerBufferSource s
                 if ( source->renderCallback ) {
                     source->renderCallback(source->source, microfadeFrames, source->skipFadeBuffer, &sourceTimestamp, source->callbackUserinfo);
                 } else {
-                    TPCircularBufferDequeueBufferListFrames(&source->buffer, &microfadeFrames, source->skipFadeBuffer, NULL, &audioDescription);
+                    TPCircularBufferDequeueBufferListFrames_iOS5(&source->buffer, &microfadeFrames, source->skipFadeBuffer, NULL, &audioDescription);
                 }
                 
                 sourceTimestamp.mSampleTime += microfadeFrames;
@@ -649,7 +649,7 @@ void AEMixerBufferDequeueSingleSource(AEMixerBuffer *THIS, AEMixerBufferSource s
                 if ( source->renderCallback ) {
                     source->renderCallback(source->source, discardFrames, NULL, &sourceTimestamp, source->callbackUserinfo);
                 } else {
-                    TPCircularBufferDequeueBufferListFrames(&source->buffer, &discardFrames, NULL, NULL, &audioDescription);
+                    TPCircularBufferDequeueBufferListFrames_iOS5(&source->buffer, &discardFrames, NULL, NULL, &audioDescription);
                 }
                 
                 sourceTimestamp.mSampleTime += discardFrames;
@@ -666,7 +666,7 @@ void AEMixerBufferDequeueSingleSource(AEMixerBuffer *THIS, AEMixerBufferSource s
             if ( source->renderCallback ) {
                 source->renderCallback(source->source, freshFrames, bufferList, &sourceTimestamp, source->callbackUserinfo);
             } else {
-                TPCircularBufferDequeueBufferListFrames(&source->buffer, &freshFrames, bufferList, NULL, &audioDescription);
+                TPCircularBufferDequeueBufferListFrames_iOS5(&source->buffer, &freshFrames, bufferList, NULL, &audioDescription);
             }
             sourceTimestamp.mSampleTime += freshFrames;
             sourceTimestamp.mHostTime += ((double)freshFrames / (double)source->audioDescription.mSampleRate) * __secondsToHostTicks;
@@ -722,7 +722,7 @@ void AEMixerBufferDequeueSingleSource(AEMixerBuffer *THIS, AEMixerBufferSource s
             if ( source->renderCallback ) {
                 source->renderCallback(source->source, *ioLengthInFrames, bufferList, &sourceTimestamp, source->callbackUserinfo);
             } else {
-                TPCircularBufferDequeueBufferListFrames(&source->buffer, ioLengthInFrames, bufferList, NULL, &audioDescription);
+                TPCircularBufferDequeueBufferListFrames_iOS5(&source->buffer, ioLengthInFrames, bufferList, NULL, &audioDescription);
             }
         }
     }
@@ -819,7 +819,7 @@ static UInt32 _AEMixerBufferPeek(AEMixerBuffer *THIS, AudioTimeStamp *outNextTim
                 frameCount = source->peekCallback(source->source, &timestamp, source->callbackUserinfo);
                 if ( frameCount != AEMixerBufferSourceInactive && respectInfiniteSourceFlag && THIS->_assumeInfiniteSources ) frameCount = UINT32_MAX;
             } else {
-                frameCount = TPCircularBufferPeek(&source->buffer, &timestamp, &audioDescription);
+                frameCount = TPCircularBufferPeek_iOS5(&source->buffer, &timestamp, &audioDescription);
             }
             
             if ( frameCount == AEMixerBufferSourceInactive ) {
@@ -909,7 +909,7 @@ static UInt32 _AEMixerBufferPeek(AEMixerBuffer *THIS, AudioTimeStamp *outNextTim
                     if ( peekEntries[i].source->renderCallback ) {
                         peekEntries[i].source->renderCallback(peekEntries[i].source->source, microfadeFrames, peekEntries[i].source->skipFadeBuffer, &peekEntries[i].timestamp, peekEntries[i].source->callbackUserinfo);
                     } else {
-                        TPCircularBufferDequeueBufferListFrames(&peekEntries[i].source->buffer, &microfadeFrames, peekEntries[i].source->skipFadeBuffer, NULL, &sourceASBD);
+                        TPCircularBufferDequeueBufferListFrames_iOS5(&peekEntries[i].source->buffer, &microfadeFrames, peekEntries[i].source->skipFadeBuffer, NULL, &sourceASBD);
                     }
                     peekEntries[i].timestamp.mSampleTime += microfadeFrames;
                     peekEntries[i].timestamp.mHostTime += ((double)microfadeFrames / (double)peekEntries[i].source->audioDescription.mSampleRate) * __secondsToHostTicks;
@@ -919,7 +919,7 @@ static UInt32 _AEMixerBufferPeek(AEMixerBuffer *THIS, AudioTimeStamp *outNextTim
                     if ( peekEntries[i].source->renderCallback ) {
                         peekEntries[i].source->renderCallback(peekEntries[i].source->source, skipFrames, NULL, &peekEntries[i].timestamp, peekEntries[i].source->callbackUserinfo);
                     } else {
-                        TPCircularBufferDequeueBufferListFrames(&peekEntries[i].source->buffer, &skipFrames, NULL, NULL, &sourceASBD);
+                        TPCircularBufferDequeueBufferListFrames_iOS5(&peekEntries[i].source->buffer, &skipFrames, NULL, NULL, &sourceASBD);
                     }
                 }
             }
@@ -1028,11 +1028,11 @@ void AEMixerBufferMarkSourceIdle(AEMixerBuffer *THIS, AEMixerBufferSource source
     prepareSkipFadeBufferForSource(self, source);
     
     if ( !source->renderCallback ) {
-        TPCircularBufferClear(&source->buffer);
+        TPCircularBufferClear_iOS5(&source->buffer);
         int bufferSize = kSourceBufferFrames * (source->audioDescription.mFormatFlags & kAudioFormatFlagIsNonInterleaved ? source->audioDescription.mBytesPerFrame * source->audioDescription.mChannelsPerFrame : source->audioDescription.mBytesPerFrame);
         if ( source->buffer.length != bufferSize ) {
-            TPCircularBufferCleanup(&source->buffer);
-            TPCircularBufferInit(&source->buffer, bufferSize);
+            TPCircularBufferCleanup_iOS5(&source->buffer);
+            TPCircularBufferInit_iOS5(&source->buffer, bufferSize);
         }
     }
     
@@ -1114,7 +1114,7 @@ void AEMixerBufferMarkSourceIdle(AEMixerBuffer *THIS, AEMixerBufferSource source
     }
     
     if ( !source->renderCallback ) {
-        TPCircularBufferCleanup(&source->buffer);
+        TPCircularBufferCleanup_iOS5(&source->buffer);
     }
     if ( source->skipFadeBuffer ) {
         for ( int j=0; j<source->skipFadeBuffer->mNumberBuffers; j++ ) {
@@ -1250,7 +1250,7 @@ static OSStatus sourceInputCallback(void *inRefCon, AudioUnitRenderActionFlags *
 
         // Create the audio converter
         checkResult(AudioConverterNew(&_mixerOutputFormat, &_clientFormat, &_audioConverter), "AudioConverterNew");
-        TPCircularBufferInit(&_audioConverterBuffer, kConversionBufferLength);
+        TPCircularBufferInit_iOS5(&_audioConverterBuffer, kConversionBufferLength);
     } else {
         checkResult(result, "AudioUnitSetProperty(kAudioUnitProperty_StreamFormat)");
     }
@@ -1259,10 +1259,10 @@ static OSStatus sourceInputCallback(void *inRefCon, AudioUnitRenderActionFlags *
 - (void)pollActionBuffer {
     while ( 1 ) {
         int32_t availableBytes;
-        action_t *action = TPCircularBufferTail(&_mainThreadActionBuffer, &availableBytes);
+        action_t *action = TPCircularBufferTail_iOS5(&_mainThreadActionBuffer, &availableBytes);
         if ( !action ) break;
         action->action(self, action->userInfo);
-        TPCircularBufferConsume(&_mainThreadActionBuffer, sizeof(action_t));
+        TPCircularBufferConsume(&_mainThreadActionBuffer, sizeof_iOS5(action_t));
     }
 }
 
@@ -1299,10 +1299,10 @@ static OSStatus sourceInputCallback(void *inRefCon, AudioUnitRenderActionFlags *
             if ( _table[i].source && !_table[i].renderCallback && !_table[i].audioDescription.mSampleRate ) {
                 int bufferSize = kSourceBufferFrames * (_clientFormat.mFormatFlags & kAudioFormatFlagIsNonInterleaved ? _clientFormat.mBytesPerFrame * _clientFormat.mChannelsPerFrame : _clientFormat.mBytesPerFrame);
                 if ( _table[i].buffer.length != bufferSize ) {
-                    TPCircularBufferCleanup(&_table[i].buffer);
-                    TPCircularBufferInit(&_table[i].buffer, bufferSize);
+                    TPCircularBufferCleanup_iOS5(&_table[i].buffer);
+                    TPCircularBufferInit_iOS5(&_table[i].buffer, bufferSize);
                 } else {
-                    TPCircularBufferClear(&_table[i].buffer);
+                    TPCircularBufferClear_iOS5(&_table[i].buffer);
                 }
             }
         }
@@ -1342,7 +1342,7 @@ static void prepareNewSource(AEMixerBuffer *THIS, AEMixerBufferSource sourceID) 
     prepareSkipFadeBufferForSource(THIS, source);
     
     int bufferSize = kSourceBufferFrames * (THIS->_clientFormat.mFormatFlags & kAudioFormatFlagIsNonInterleaved ? THIS->_clientFormat.mBytesPerFrame * THIS->_clientFormat.mChannelsPerFrame : THIS->_clientFormat.mBytesPerFrame);
-    TPCircularBufferInit(&source->buffer, bufferSize);
+    TPCircularBufferInit_iOS5(&source->buffer, bufferSize);
     
     OSMemoryBarrier();
     source->source = sourceID;

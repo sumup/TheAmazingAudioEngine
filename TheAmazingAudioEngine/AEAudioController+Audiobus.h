@@ -1,5 +1,5 @@
 //
-//  AEAudioController+Audiobus.h
+//  AEAudioController_iOS5+Audiobus.h
 //  TheAmazingAudioEngine
 //
 //  Created by Michael Tyson on 06/05/2012.
@@ -34,7 +34,7 @@ extern "C" {
 @class ABReceiverPort;
 @class ABSenderPort;
 
-@interface AEAudioController (AudiobusAdditions)
+@interface AEAudioController_iOS5 (AudiobusAdditions)
 
 /*!
  * Set an Audiobus sender port to send audio from a particular channel

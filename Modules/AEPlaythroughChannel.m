@@ -26,17 +26,17 @@
 #import "AEPlaythroughChannel.h"
 #import "TPCircularBuffer.h"
 #import "TPCircularBuffer+AudioBufferList.h"
-#import "AEAudioController+Audiobus.h"
-#import "AEAudioController+AudiobusStub.h"
+#import "AEAudioController_iOS5+Audiobus.h"
+#import "AEAudioController_iOS5+AudiobusStub.h"
 
 static const int kAudioBufferLength = 16384;
 static const int kAudiobusReceiverPortConnectedToSelfChanged;
 
 @interface AEPlaythroughChannel () {
-    TPCircularBuffer _buffer;
+    TPCircularBuffer_iOS5 _buffer;
     BOOL _audiobusConnectedToSelf;
 }
-@property (nonatomic, retain) AEAudioController *audioController;
+@property (nonatomic, retain) AEAudioController_iOS5 *audioController;
 @end
 
 @implementation AEPlaythroughChannel
@@ -46,21 +46,21 @@ static const int kAudiobusReceiverPortConnectedToSelfChanged;
     return [NSSet setWithObject:@"audioController.inputAudioDescription"];
 }
 
-- (id)initWithAudioController:(AEAudioController*)audioController {
+- (id)initWithAudioController:(AEAudioController_iOS5*)audioController {
     if ( !(self = [super init]) ) return nil;
-    TPCircularBufferInit(&_buffer, kAudioBufferLength);
+    TPCircularBufferInit_iOS5(&_buffer, kAudioBufferLength);
     self.audioController = audioController;
     _volume = 1.0;
     return self;
 }
 
 - (void)dealloc {
-    TPCircularBufferCleanup(&_buffer);
+    TPCircularBufferCleanup_iOS5(&_buffer);
     self.audioController = nil;
     [super dealloc];
 }
 
--(void)setAudioController:(AEAudioController *)audioController {
+-(void)setAudioController:(AEAudioController_iOS5 *)audioController {
     if ( _audioController ) {
         [_audioController removeObserver:self forKeyPath:@"audiobusReceiverPort.connectedToSelf"];
     }
@@ -81,22 +81,22 @@ static const int kAudiobusReceiverPortConnectedToSelfChanged;
 }
 
 static void inputCallback(id                        receiver,
-                          AEAudioController        *audioController,
+                          AEAudioController_iOS5        *audioController,
                           void                     *source,
                           const AudioTimeStamp     *time,
                           UInt32                    frames,
                           AudioBufferList          *audio) {
     AEPlaythroughChannel *THIS = receiver;
     if ( THIS->_audiobusConnectedToSelf ) return;
-    TPCircularBufferCopyAudioBufferList(&THIS->_buffer, audio, time, kTPCircularBufferCopyAll, NULL);
+    TPCircularBufferCopyAudioBufferList_iOS5(&THIS->_buffer, audio, time, kTPCircularBufferCopyAll, NULL);
 }
 
--(AEAudioControllerAudioCallback)receiverCallback {
+-(AEAudioController_iOS5AudioCallback)receiverCallback {
     return inputCallback;
 }
 
 static OSStatus renderCallback(id                        channel,
-                               AEAudioController        *audioController,
+                               AEAudioController_iOS5        *audioController,
                                const AudioTimeStamp     *time,
                                UInt32                    frames,
                                AudioBufferList          *audio) {
@@ -104,32 +104,32 @@ static OSStatus renderCallback(id                        channel,
     
     while ( 1 ) {
         // Discard any buffers with an incompatible format, in the event of a format change
-        AudioBufferList *nextBuffer = TPCircularBufferNextBufferList(&THIS->_buffer, NULL);
+        AudioBufferList *nextBuffer = TPCircularBufferNextBufferList_iOS5(&THIS->_buffer, NULL);
         if ( !nextBuffer ) break;
         if ( nextBuffer->mNumberBuffers == audio->mNumberBuffers ) break;
-        TPCircularBufferConsumeNextBufferList(&THIS->_buffer);
+        TPCircularBufferConsumeNextBufferList_iOS5(&THIS->_buffer);
     }
     
-    UInt32 fillCount = TPCircularBufferPeek(&THIS->_buffer, NULL, AEAudioControllerAudioDescription(audioController));
+    UInt32 fillCount = TPCircularBufferPeek(&THIS->_buffer, NULL, AEAudioController_iOS5AudioDescription_iOS5(audioController));
     if ( fillCount > frames ) {
         UInt32 skip = fillCount - frames;
-        TPCircularBufferDequeueBufferListFrames(&THIS->_buffer,
+        TPCircularBufferDequeueBufferListFrames_iOS5(&THIS->_buffer,
                                                 &skip,
                                                 NULL,
                                                 NULL,
-                                                AEAudioControllerAudioDescription(audioController));
+                                                AEAudioController_iOS5AudioDescription(audioController));
     }
     
-    TPCircularBufferDequeueBufferListFrames(&THIS->_buffer,
+    TPCircularBufferDequeueBufferListFrames_iOS5(&THIS->_buffer,
                                             &frames,
                                             audio,
                                             NULL,
-                                            AEAudioControllerAudioDescription(audioController));
+                                            AEAudioController_iOS5AudioDescription(audioController));
 
     return noErr;
 }
 
--(AEAudioControllerRenderCallback)renderCallback {
+-(AEAudioController_iOS5RenderCallback)renderCallback {
     return renderCallback;
 }
 
