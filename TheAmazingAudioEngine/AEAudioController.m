@@ -987,6 +987,7 @@ static OSStatus topRenderNotifyCallback(void *inRefCon, AudioUnitRenderActionFla
     AEChannelRef removedChannels[count];
     memset(removedChannels, 0, sizeof(removedChannels));
     AEChannelRef *removedChannels_p = removedChannels;
+    NSAssert(group != nil, @"AEChannelGroupRef should not be nil");
     int priorCount = group->channelCount;
     [self performSynchronousMessageExchangeWithBlock:^{
         removeChannelsFromGroup(self, group, ptrMatchArray, objectMatchArray, removedChannels_p, count);
@@ -1150,6 +1151,7 @@ static OSStatus topRenderNotifyCallback(void *inRefCon, AudioUnitRenderActionFla
 
 #pragma mark - Filters
 
+#ifndef __clang_analyzer__
 - (void)addFilter:(id<AEAudioFilter>)filter {
     if ( [self addCallback:filter.filterCallback userInfo:(__bridge void *)filter flags:kFilterFlag forChannelGroup:_topGroup] ) {
         CFBridgingRetain(filter);
@@ -1178,6 +1180,7 @@ static OSStatus topRenderNotifyCallback(void *inRefCon, AudioUnitRenderActionFla
         CFBridgingRetain(filter);
     }
 }
+#endif
 
 - (void)removeFilter:(id<AEAudioFilter>)filter {
     if ( [self removeCallback:filter.filterCallback userInfo:(__bridge void *)filter fromChannelGroup:_topGroup] ) {
@@ -1232,7 +1235,7 @@ static OSStatus topRenderNotifyCallback(void *inRefCon, AudioUnitRenderActionFla
 }
 
 #pragma mark - Output receivers
-
+#ifndef __clang_analyzer__
 - (void)addOutputReceiver:(id<AEAudioReceiver>)receiver {
     if ( [self addCallback:receiver.receiverCallback userInfo:(__bridge void *)receiver flags:kReceiverFlag forChannelGroup:_topGroup] ) {
         CFBridgingRetain(receiver);
@@ -1268,6 +1271,7 @@ static OSStatus topRenderNotifyCallback(void *inRefCon, AudioUnitRenderActionFla
         CFBridgingRelease((__bridge CFTypeRef)receiver);
     }
 }
+#endif
 
 - (NSArray*)outputReceivers {
     return [self associatedObjectsWithFlags:kReceiverFlag];
@@ -1282,7 +1286,7 @@ static OSStatus topRenderNotifyCallback(void *inRefCon, AudioUnitRenderActionFla
 }
 
 #pragma mark - Input receivers
-
+#ifndef __clang_analyzer__
 - (void)addInputReceiver:(id<AEAudioReceiver>)receiver {
     [self addInputReceiver:receiver forChannels:nil];
 }
@@ -1294,6 +1298,7 @@ static OSStatus topRenderNotifyCallback(void *inRefCon, AudioUnitRenderActionFla
         CFBridgingRetain(receiver);
     }
 }
+#endif
 
 - (void)removeInputReceiver:(id<AEAudioReceiver>)receiver {
     void *callback = receiver.receiverCallback;
@@ -2476,7 +2481,7 @@ static void interAppConnectedChangeCallback(void *inRefCon, AudioUnit inUnit, Au
     
     BOOL inputAvailable          = audioSession.inputAvailable;
     BOOL hardwareInputAvailable  = inputAvailable;
-    int numberOfInputChannels = _audioDescription.mChannelsPerFrame;
+    __unused int numberOfInputChannels = _audioDescription.mChannelsPerFrame;
     BOOL usingAudiobus           = NO;
     UInt32 usingIAA              = NO;
     

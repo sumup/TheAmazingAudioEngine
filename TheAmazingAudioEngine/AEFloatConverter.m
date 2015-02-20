@@ -122,6 +122,7 @@ static OSStatus complexInputDataProc(AudioConverterRef             inAudioConver
     [self updateFormats];
 }
 
+#ifndef __clang_analyzer__
 BOOL AEFloatConverterToFloat(__unsafe_unretained AEFloatConverter* THIS, AudioBufferList *sourceBuffer, float * const * targetBuffers, UInt32 frames) {
     if ( frames == 0 ) return YES;
     
@@ -159,6 +160,7 @@ BOOL AEFloatConverterToFloat(__unsafe_unretained AEFloatConverter* THIS, AudioBu
     
     return YES;
 }
+#endif
 
 BOOL AEFloatConverterToFloatBufferList(__unsafe_unretained AEFloatConverter* THIS, AudioBufferList *sourceBuffer, AudioBufferList *targetBuffer, UInt32 frames) {
     assert(targetBuffer->mNumberBuffers == THIS->_floatAudioDescription.mChannelsPerFrame);
@@ -170,6 +172,7 @@ BOOL AEFloatConverterToFloatBufferList(__unsafe_unretained AEFloatConverter* THI
     return AEFloatConverterToFloat(THIS, sourceBuffer, targetBuffers, frames);
 }
 
+#ifndef __clang_analyzer__
 BOOL AEFloatConverterFromFloat(__unsafe_unretained AEFloatConverter* THIS, float * const * sourceBuffers, AudioBufferList *targetBuffer, UInt32 frames) {
     if ( frames == 0 ) return YES;
     
@@ -206,6 +209,7 @@ BOOL AEFloatConverterFromFloat(__unsafe_unretained AEFloatConverter* THIS, float
     
     return YES;
 }
+#endif
 
 BOOL AEFloatConverterFromFloatBufferList(__unsafe_unretained AEFloatConverter* THIS, AudioBufferList *sourceBuffer, AudioBufferList *targetBuffer, UInt32 frames) {
     assert(sourceBuffer->mNumberBuffers == THIS->_floatAudioDescription.mChannelsPerFrame);

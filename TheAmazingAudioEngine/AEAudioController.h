@@ -740,7 +740,7 @@ typedef void (*AEAudioControllerMainThreadMessageHandler)(AEAudioController *aud
  *
  * @param filter The filter to remove
  */
-- (void)removeFilter:(id<AEAudioFilter>)filter;
+- (void)removeFilter:(id<AEAudioFilter>)NS_RELEASES_ARGUMENT filter;
 
 /*!
  * Remove a filter from a channel
@@ -748,7 +748,7 @@ typedef void (*AEAudioControllerMainThreadMessageHandler)(AEAudioController *aud
  * @param filter  The filter to remove
  * @param channel The channel to stop filtering
  */
-- (void)removeFilter:(id<AEAudioFilter>)filter fromChannel:(id<AEAudioPlayable>)channel;
+- (void)removeFilter:(id<AEAudioFilter>)NS_RELEASES_ARGUMENT filter fromChannel:(id<AEAudioPlayable>)channel;
 
 /*!
  * Remove a filter from a channel group
@@ -756,14 +756,14 @@ typedef void (*AEAudioControllerMainThreadMessageHandler)(AEAudioController *aud
  * @param filter The filter to remove
  * @param group  The group to stop filtering
  */
-- (void)removeFilter:(id<AEAudioFilter>)filter fromChannelGroup:(AEChannelGroupRef)group;
+- (void)removeFilter:(id<AEAudioFilter>)NS_RELEASES_ARGUMENT filter fromChannelGroup:(AEChannelGroupRef)group;
 
 /*!
  * Remove a filter from system input
  *
  * @param filter The filter to remove
  */
-- (void)removeInputFilter:(id<AEAudioFilter>)filter;
+- (void)removeInputFilter:(id<AEAudioFilter>)NS_RELEASES_ARGUMENT filter;
 
 /*!
  * Get a list of all top-level output filters
