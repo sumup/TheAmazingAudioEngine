@@ -238,11 +238,11 @@ static inline BOOL _checkResult(OSStatus result, const char *operation, const ch
     }
 }
 
-OSStatus AEAudioFileWriterAddAudio(AEAudioFileWriter_iOS5* THIS, AudioBufferList *bufferList, UInt32 lengthInFrames) {
+OSStatus AEAudioFileWriterAddAudio_iOS5(AEAudioFileWriter_iOS5* THIS, AudioBufferList *bufferList, UInt32 lengthInFrames) {
     return ExtAudioFileWriteAsync(THIS->_audioFile, lengthInFrames, bufferList);
 }
 
-OSStatus AEAudioFileWriterAddAudioSynchronously(AEAudioFileWriter_iOS5* THIS, AudioBufferList *bufferList, UInt32 lengthInFrames) {
+OSStatus AEAudioFileWriterAddAudioSynchronously_iOS5(AEAudioFileWriter_iOS5* THIS, AudioBufferList *bufferList, UInt32 lengthInFrames) {
     return ExtAudioFileWrite(THIS->_audioFile, lengthInFrames, bufferList);
 }
 

@@ -13,7 +13,7 @@
 static double __hostTicksToSeconds = 0.0;
 static double __secondsToHostTicks = 0.0;
 
-const int kMaximumSchedules = 100;
+const int kMaximumSchedules_iOS5 = 100;
 
 NSString const * AEBlockSchedulerKeyBlock_iOS5 = @"block";
 NSString const * AEBlockSchedulerKeyTimestampInHostTicks_iOS5 = @"time";
@@ -30,7 +30,7 @@ struct _schedule_t {
 };
 
 @interface AEBlockScheduler_iOS5 () {
-    struct _schedule_t _schedule[kMaximumSchedules];
+    struct _schedule_t _schedule[kMaximumSchedules_iOS5];
     int _head;
     int _tail;
 }
@@ -83,7 +83,7 @@ struct _schedule_t {
 }
 
 -(void)dealloc {
-    for ( int i=0; i<kMaximumSchedules; i++ ) {
+    for ( int i=0; i<kMaximumSchedules_iOS5; i++ ) {
         if ( _schedule[i].block ) {
             [_schedule[i].block release];
             if ( _schedule[i].responseBlock ) {
@@ -104,7 +104,7 @@ struct _schedule_t {
 -(void)scheduleBlock:(AEBlockSchedulerBlock)block atTime:(uint64_t)time timingContext:(AEAudioTimingContext)context identifier:(id<NSCopying>)identifier mainThreadResponseBlock:(AEBlockSchedulerResponseBlock)response {
     NSAssert(identifier != nil && block != nil, @"Identifier and block must not be nil");
     
-    if ( (_head+1)%kMaximumSchedules == _tail ) {
+    if ( (_head+1)%kMaximumSchedules_iOS5 == _tail ) {
         NSLog(@"Unable to schedule block %@: No space in scheduling table.", identifier);
         return;
     }
@@ -119,7 +119,7 @@ struct _schedule_t {
     
     OSMemoryBarrier();
     
-    _head = (_head+1) % kMaximumSchedules;
+    _head = (_head+1) % kMaximumSchedules_iOS5;
     [_scheduledIdentifiers addObject:identifier];
 }
 
@@ -130,11 +130,11 @@ struct _schedule_t {
 -(void)cancelScheduleWithIdentifier:(id<NSCopying>)identifier {
     NSAssert(identifier != nil, @"Identifier must not be nil");
     
-    struct _schedule_t *pointers[kMaximumSchedules];
-    struct _schedule_t values[kMaximumSchedules];
+    struct _schedule_t *pointers[kMaximumSchedules_iOS5];
+    struct _schedule_t values[kMaximumSchedules_iOS5];
     int scheduleCount = 0;
     
-    for ( int i=_tail; i != _head; i=(i+1)%kMaximumSchedules ) {
+    for ( int i=_tail; i != _head; i=(i+1)%kMaximumSchedules_iOS5 ) {
         if ( _schedule[i].identifier && [_schedule[i].identifier isEqual:identifier] ) {
             pointers[scheduleCount] = &_schedule[i];
             values[scheduleCount] = _schedule[i];
@@ -150,7 +150,7 @@ struct _schedule_t {
             memset(pointers_array[i], 0, sizeof(struct _schedule_t));
             if ( (pointers_array[i] - _schedule) == _tail ) {
                 while ( !_schedule[_tail].block && _tail != _head ) {
-                    _tail = (_tail + 1) % kMaximumSchedules;
+                    _tail = (_tail + 1) % kMaximumSchedules_iOS5;
                 }
             }
         }
@@ -181,7 +181,7 @@ struct _schedule_t {
 }
 
 - (struct _schedule_t*)scheduleWithIdentifier:(id<NSCopying>)identifier {
-    for ( int i=_tail; i != _head; i=(i+1)%kMaximumSchedules ) {
+    for ( int i=_tail; i != _head; i=(i+1)%kMaximumSchedules_iOS5 ) {
         if ( (identifier && _schedule[i].identifier && [_schedule[i].identifier isEqual:identifier]) ) {
             return &_schedule[i];
         }
@@ -212,7 +212,7 @@ static void timingReceiver(id                        receiver,
     AEBlockScheduler_iOS5 *THIS = receiver;
     uint64_t endTime = time->mHostTime + AEConvertFramesToSeconds_iOS5(audioController, frames)*__secondsToHostTicks;
     
-    for ( int i=THIS->_tail; i != THIS->_head; i=(i+1)%kMaximumSchedules ) {
+    for ( int i=THIS->_tail; i != THIS->_head; i=(i+1)%kMaximumSchedules_iOS5 ) {
         if ( THIS->_schedule[i].block && THIS->_schedule[i].context == context && THIS->_schedule[i].time && endTime >= THIS->_schedule[i].time ) {
             UInt32 offset = THIS->_schedule[i].time > time->mHostTime ? (UInt32)AEConvertSecondsToFrames_iOS5(audioController, (THIS->_schedule[i].time - time->mHostTime)*__hostTicksToSeconds) : 0;
             THIS->_schedule[i].block(time, offset);
@@ -223,7 +223,7 @@ static void timingReceiver(id                        receiver,
             memset(&THIS->_schedule[i], 0, sizeof(struct _schedule_t));
             if ( i == THIS->_tail ) {
                 while ( !THIS->_schedule[THIS->_tail].block && THIS->_tail != THIS->_head ) {
-                    THIS->_tail = (THIS->_tail + 1) % kMaximumSchedules;
+                    THIS->_tail = (THIS->_tail + 1) % kMaximumSchedules_iOS5;
                 }
             }
         }

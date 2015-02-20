@@ -172,7 +172,7 @@ BOOL AEFloatConverterToFloatBufferList_iOS5(__unsafe_unretained AEFloatConverter
 }
 
 #ifndef __clang_analyzer__
-BOOL AEFloatConverterFromFloat(__unsafe_unretained AEFloatConverter_iOS5* THIS, float * const * sourceBuffers, AudioBufferList *targetBuffer, UInt32 frames) {
+BOOL AEFloatConverterFromFloat_iOS5(__unsafe_unretained AEFloatConverter_iOS5* THIS, float * const * sourceBuffers, AudioBufferList *targetBuffer, UInt32 frames) {
     if ( frames == 0 ) return YES;
     
     if ( THIS->_fromFloatConverter ) {
@@ -210,14 +210,14 @@ BOOL AEFloatConverterFromFloat(__unsafe_unretained AEFloatConverter_iOS5* THIS, 
 }
 #endif
 
-BOOL AEFloatConverterFromFloatBufferList(__unsafe_unretained AEFloatConverter_iOS5* THIS, AudioBufferList *sourceBuffer, AudioBufferList *targetBuffer, UInt32 frames) {
+BOOL AEFloatConverterFromFloatBufferList_iOS5(__unsafe_unretained AEFloatConverter_iOS5* THIS, AudioBufferList *sourceBuffer, AudioBufferList *targetBuffer, UInt32 frames) {
     assert(sourceBuffer->mNumberBuffers == THIS->_floatAudioDescription.mChannelsPerFrame);
     
     float *sourceBuffers[sourceBuffer->mNumberBuffers];
     for ( int i=0; i<sourceBuffer->mNumberBuffers; i++ ) {
         sourceBuffers[i] = (float*)sourceBuffer->mBuffers[i].mData;
     }
-    return AEFloatConverterFromFloat(THIS, sourceBuffers, targetBuffer, frames);
+    return AEFloatConverterFromFloat_iOS5(THIS, sourceBuffers, targetBuffer, frames);
 }
 
 static OSStatus complexInputDataProc(AudioConverterRef             inAudioConverter,

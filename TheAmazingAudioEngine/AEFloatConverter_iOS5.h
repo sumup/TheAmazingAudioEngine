@@ -90,7 +90,7 @@ BOOL AEFloatConverterToFloatBufferList_iOS5(AEFloatConverter_iOS5* converter, Au
  * @param frames            The number of frames to convert.
  * @return YES on success; NO on failure
  */
-BOOL AEFloatConverterFromFloat(AEFloatConverter_iOS5* converter, float * const * sourceBuffers, AudioBufferList *targetBuffer, UInt32 frames);
+BOOL AEFloatConverterFromFloat_iOS5(AEFloatConverter_iOS5* converter, float * const * sourceBuffers, AudioBufferList *targetBuffer, UInt32 frames);
 
 /*!
  * Convert audio from floating-point, in a buffer list
@@ -105,7 +105,7 @@ BOOL AEFloatConverterFromFloat(AEFloatConverter_iOS5* converter, float * const *
  * @param frames            The number of frames to convert.
  * @return YES on success; NO on failure
  */
-BOOL AEFloatConverterFromFloatBufferList(AEFloatConverter_iOS5* converter, AudioBufferList *sourceBuffer, AudioBufferList *targetBuffer, UInt32 frames);
+BOOL AEFloatConverterFromFloatBufferList_iOS5(AEFloatConverter_iOS5* converter, AudioBufferList *sourceBuffer, AudioBufferList *targetBuffer, UInt32 frames);
 
 /*!
  * The AudioStreamBasicDescription representing the converted floating-point format

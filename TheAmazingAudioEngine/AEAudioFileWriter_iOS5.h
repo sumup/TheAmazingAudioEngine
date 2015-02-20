@@ -87,7 +87,7 @@ enum {
  * @param lengthInFrames The length of the audio in the buffer list, in frames
  * @return A status code; noErr on success
  */
-OSStatus AEAudioFileWriterAddAudio(AEAudioFileWriter_iOS5* writer, AudioBufferList *bufferList, UInt32 lengthInFrames);
+OSStatus AEAudioFileWriterAddAudio_iOS5(AEAudioFileWriter_iOS5* writer, AudioBufferList *bufferList, UInt32 lengthInFrames);
 
 /*!
  * Add audio to be written, synchronously
@@ -101,7 +101,7 @@ OSStatus AEAudioFileWriterAddAudio(AEAudioFileWriter_iOS5* writer, AudioBufferLi
  * @param lengthInFrames The length of the audio in the buffer list, in frames
  * @return A status code; noErr on success
  */
-OSStatus AEAudioFileWriterAddAudioSynchronously(AEAudioFileWriter_iOS5* writer, AudioBufferList *bufferList, UInt32 lengthInFrames);
+OSStatus AEAudioFileWriterAddAudioSynchronously_iOS5(AEAudioFileWriter_iOS5* writer, AudioBufferList *bufferList, UInt32 lengthInFrames);
 
 /*!
  * The path to the file being written
