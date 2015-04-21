@@ -488,6 +488,9 @@ static OSStatus inputAudioProducer(void *userInfo, AudioBufferList *audio, UInt3
         checkResult(result, "AudioConverterConvertComplexBuffer");
     } else {
         for ( int i=0; i<audio->mNumberBuffers && i<THIS->_inputAudioBufferList->mNumberBuffers; i++ ) {
+            if (!THIS->_inputAudioBufferList->mBuffers[i].mData) {
+                break;
+            }
             audio->mBuffers[i].mDataByteSize = MIN(audio->mBuffers[i].mDataByteSize, THIS->_inputAudioBufferList->mBuffers[i].mDataByteSize);
             memcpy(audio->mBuffers[i].mData, THIS->_inputAudioBufferList->mBuffers[i].mData, audio->mBuffers[i].mDataByteSize);
         }
