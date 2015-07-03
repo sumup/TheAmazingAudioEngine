@@ -1669,11 +1669,12 @@ static BOOL AEAudioController_iOS5HasPendingMainThreadMessages(AEAudioController
 }
 
 #pragma mark - Utilities
-
+__attribute__((visibility("default")))
 AudioStreamBasicDescription *AEAudioController_iOS5AudioDescription(AEAudioController_iOS5 *THIS) {
     return &THIS->_audioDescription;
 }
 
+__attribute__((visibility("default")))
 AudioStreamBasicDescription *AEAudioController_iOS5InputAudioDescription(AEAudioController_iOS5 *THIS) {
     return &THIS->_inputCallbacks[0].audioDescription;
 }

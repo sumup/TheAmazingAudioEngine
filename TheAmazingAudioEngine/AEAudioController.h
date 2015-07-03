@@ -416,6 +416,7 @@ typedef void (*AEAudioController_iOS5MainThreadMessageHandler)(AEAudioController
  *     Note that all these can be added/removed during operation as well.
  *  4. Call @link start: @endlink to begin processing audio.
  */
+__attribute__((visibility("default")))
 @interface AEAudioController_iOS5 : NSObject
 
 #pragma mark - Setup and start/stop

@@ -95,6 +95,7 @@
 		4CE501971493F82600F23607 /* TheAmazingAudioEngine_iOS5-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TheAmazingAudioEngine_iOS5-Prefix.pch"; sourceTree = "<group>"; };
 		4CEC0EB716B5294200D11ED9 /* AEBlockFilter_iOS5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AEBlockFilter_iOS5.h; sourceTree = "<group>"; };
 		4CEC0EB816B5294300D11ED9 /* AEBlockFilter_iOS5.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AEBlockFilter_iOS5.m; sourceTree = "<group>"; };
+		C8C34E8D1B42F12A008415E3 /* StripSymbols.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = StripSymbols.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -158,6 +159,7 @@
 		4CE501811493F82600F23607 = {
 			isa = PBXGroup;
 			children = (
+				C8C34E8D1B42F12A008415E3 /* StripSymbols.xcconfig */,
 				4CE501911493F82600F23607 /* TheAmazingAudioEngine */,
 				4C8A0F401540BBD700307CB6 /* Modules */,
 				4C215CED1523A7D500D36CAD /* Frameworks */,
@@ -362,6 +364,7 @@
 		};
 		4C215CF81523A7D600D36CAD /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C8C34E8D1B42F12A008415E3 /* StripSymbols.xcconfig */;
 			buildSettings = {
 				DSTROOT = /tmp/TheAmazingAudioEngine.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -423,6 +426,7 @@
 		};
 		4CE501991493F82600F23607 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C8C34E8D1B42F12A008415E3 /* StripSymbols.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
