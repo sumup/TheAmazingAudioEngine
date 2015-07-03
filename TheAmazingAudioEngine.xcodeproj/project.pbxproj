@@ -95,6 +95,7 @@
 		4CE501971493F82600F23607 /* TheAmazingAudioEngine-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TheAmazingAudioEngine-Prefix.pch"; sourceTree = "<group>"; };
 		4CEC0EB716B5294200D11ED9 /* AEBlockFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AEBlockFilter.h; sourceTree = "<group>"; };
 		4CEC0EB816B5294300D11ED9 /* AEBlockFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AEBlockFilter.m; sourceTree = "<group>"; };
+		C8C34E891B42F048008415E3 /* StripSymbols.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = StripSymbols.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -158,6 +159,7 @@
 		4CE501811493F82600F23607 = {
 			isa = PBXGroup;
 			children = (
+				C8C34E891B42F048008415E3 /* StripSymbols.xcconfig */,
 				4CE501911493F82600F23607 /* TheAmazingAudioEngine */,
 				4C8A0F401540BBD700307CB6 /* Modules */,
 				4C215CED1523A7D500D36CAD /* Frameworks */,
@@ -363,6 +365,7 @@
 		};
 		4C215CF81523A7D600D36CAD /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C8C34E891B42F048008415E3 /* StripSymbols.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
 				DSTROOT = /tmp/TheAmazingAudioEngine.dst;

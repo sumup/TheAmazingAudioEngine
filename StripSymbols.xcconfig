@@ -1,0 +1,12 @@
+//
+//  StripSymbols.xcconfig
+//
+//  Created by Felix Schneider on 30.06.2015.
+//  Copyright (c) 2015 iosphere GmbH. All rights reserved.
+//
+
+DEAD_CODE_STRIPPING = YES;
+DEPLOYMENT_POSTPROCESSING = YES;
+GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+GENERATE_MASTER_OBJECT_FILE = YES;
+STRIPFLAGS = -r -u;

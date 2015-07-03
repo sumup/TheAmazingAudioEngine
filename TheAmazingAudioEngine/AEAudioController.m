@@ -1616,11 +1616,12 @@ static BOOL AEAudioControllerHasPendingMainThreadMessages(__unsafe_unretained AE
 }
 
 #pragma mark - Utilities
-
+__attribute__((visibility("default")))
 AudioStreamBasicDescription *AEAudioControllerAudioDescription(__unsafe_unretained AEAudioController *THIS) {
     return &THIS->_audioDescription;
 }
 
+__attribute__((visibility("default")))
 AudioStreamBasicDescription *AEAudioControllerInputAudioDescription(__unsafe_unretained AEAudioController *THIS) {
     return &THIS->_inputCallbacks[0].audioDescription;
 }
