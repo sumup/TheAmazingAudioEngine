@@ -315,7 +315,7 @@ static void interruptionListener(void *inClientData, UInt32 inInterruption) {
     AEAudioController_iOS5 *THIS = __interruptionListenerSelf;
     
     if (inInterruption == kAudioSessionEndInterruption) {
-        NSLog(@"TAAE: Audio session interruption ended");
+        TAAELog(@"Audio session interruption ended");
         THIS->_interrupted = NO;
         
         if ( [[UIApplication sharedApplication] applicationState] != UIApplicationStateBackground || THIS->_runningPriorToInterruption ) {
@@ -329,7 +329,7 @@ static void interruptionListener(void *inClientData, UInt32 inInterruption) {
         
         [[NSNotificationCenter defaultCenter] postNotificationName:AEAudioController_iOS5SessionInterruptionEndedNotification object:THIS];
     } else if (inInterruption == kAudioSessionBeginInterruption) {
-        NSLog(@"TAAE: Audio session interrupted");
+        TAAELog(@"Audio session interrupted");
         THIS->_runningPriorToInterruption = THIS->_running;
         
         THIS->_interrupted = YES;
@@ -359,7 +359,7 @@ static void audioSessionPropertyListener(void *inClientData, AudioSessionPropert
         
         THIS.audioRoute = [NSString stringWithString:(NSString*)route];
         
-        NSLog(@"TAAE: Changed audio route to %@", THIS.audioRoute);
+        TAAELog(@"Changed audio route to %@", THIS.audioRoute);
         
         BOOL playingThroughSpeaker;
         if ( [(NSString*)route isEqualToString:@"SpeakerAndMicrophone"] || [(NSString*)route isEqualToString:@"Speaker"] ) {
@@ -900,7 +900,7 @@ static OSStatus topRenderNotifyCallback(void *inRefCon, AudioUnitRenderActionFla
 -(BOOL)start:(NSError**)error recoveringFromErrors:(BOOL)recoverFromErrors {
     OSStatus status;
     
-    NSLog(@"TAAE: Starting Engine");
+    TAAELog(@"Starting Engine");
     
     if ( !_audioGraph ) {
         if ( error ) *error = _lastError;
@@ -956,7 +956,7 @@ static OSStatus topRenderNotifyCallback(void *inRefCon, AudioUnitRenderActionFla
 }
 
 - (void)stop {
-    NSLog(@"TAAE: Stopping Engine");
+    TAAELog(@"Stopping Engine");
     
     if ( _running ) {
         checkResult(AUGraphStop(_audioGraph), "AUGraphStop");
@@ -1586,7 +1586,7 @@ static void processPendingMessagesOnRealtimeThread(AEAudioController_iOS5 *THIS)
     }
     
     if ( !finished ) {
-        NSLog(@"TAAE: Timed out while performing message exchange");
+        TAAELog(@"Timed out while performing message exchange");
         @synchronized ( self ) {
             processPendingMessagesOnRealtimeThread(self);
             [self pollForMessageResponses];
@@ -1690,7 +1690,7 @@ NSTimeInterval AEConvertFramesToSeconds_iOS5(AEAudioController_iOS5 *THIS, long 
 #pragma mark - Setters, getters
 
 -(void)setAudioSessionCategory:(UInt32)audioSessionCategory {
-    NSLog(@"TAAE: Setting audio session category to %@",
+    TAAELog(@"Setting audio session category to %@",
           audioSessionCategory == kAudioSessionCategory_MediaPlayback ? @"MediaPlayback":
           audioSessionCategory == kAudioSessionCategory_PlayAndRecord ? @"PlayAndRecord":
           audioSessionCategory == kAudioSessionCategory_LiveAudio ? @"LiveAudio":
@@ -1703,7 +1703,7 @@ NSTimeInterval AEConvertFramesToSeconds_iOS5(AEAudioController_iOS5 *THIS, long 
     UInt32 category = _audioSessionCategory;
     
     if ( !_audioInputAvailable && (category == kAudioSessionCategory_PlayAndRecord || category == kAudioSessionCategory_RecordAudio) ) {
-        NSLog(@"TAAE: No input available. Using MediaPlayback category instead.");
+        TAAELog(@"No input available. Using MediaPlayback category instead.");
         category = kAudioSessionCategory_MediaPlayback;
     }
     
@@ -2187,7 +2187,7 @@ NSTimeInterval AEAudioController_iOS5OutputLatency(AEAudioController_iOS5 *contr
     checkResult(result, "AudioSessionGetProperty(kAudioSessionProperty_CurrentHardwareIOBufferDuration)");
     if ( _currentBufferDuration != bufferDuration ) self.currentBufferDuration = bufferDuration;
     
-    NSLog(@"TAAE: Audio session initialized (%@)", [extraInfo stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@", "]]);
+    TAAELog(@"Audio session initialized (%@)", [extraInfo stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@", "]]);
     return YES;
 }
 
@@ -2262,7 +2262,7 @@ NSTimeInterval AEAudioController_iOS5OutputLatency(AEAudioController_iOS5 *contr
         return NO;
     }
     
-    NSLog(@"TAAE: Engine setup");
+    TAAELog(@"Engine setup");
     
     return YES;
 }
@@ -2428,9 +2428,9 @@ static void IsInterAppConnectedCallback(void *inRefCon, AudioUnit inUnit, AudioU
     if ( io_desc.componentSubType != target_io_desc.componentSubType ) {
         
         if ( useVoiceProcessing ) {
-            NSLog(@"TAAE: Restarting audio system to use VPIO");
+            TAAELog(@"Restarting audio system to use VPIO");
         } else {
-            NSLog(@"TAAE: Restarting audio system to use normal input unit");
+            TAAELog(@"Restarting audio system to use normal input unit");
         }
         
         return YES;
@@ -2481,7 +2481,7 @@ static void IsInterAppConnectedCallback(void *inRefCon, AudioUnit inUnit, AudioU
                 if ( result == noErr ) {
                     numberOfInputChannels = channels;
                 } else {
-                    NSLog(@"TAAE: Audio session error (rdar://13022588). Power-cycling audio session.");
+                    TAAELog(@"Audio session error (rdar://13022588). Power-cycling audio session.");
                     AudioSessionSetActive(false);
                     AudioSessionSetActive(true);
                     result = AudioSessionGetProperty(kAudioSessionProperty_CurrentHardwareInputNumberChannels, &size, &channels);
@@ -2747,14 +2747,14 @@ static void IsInterAppConnectedCallback(void *inRefCon, AudioUnit inUnit, AudioU
     
     if ( inputChannelsChanged || inputAvailableChanged || inputDescriptionChanged ) {
         if ( inputAvailable ) {
-            NSLog(@"TAAE: Input status updated (%u channel, %@%@%@%@)",
+            TAAELog(@"Input status updated (%u channel, %@%@%@%@)",
                   (unsigned int)numberOfInputChannels,
                   usingAudiobus ? @"using Audiobus, " : @"",
                   rawAudioDescription.mFormatFlags & kAudioFormatFlagIsNonInterleaved ? @"non-interleaved" : @"interleaved",
                   [self usingVPIO] ? @", using voice processing" : @"",
                   inputCallbacks[0].audioConverter ? @", with converter" : @"");
         } else {
-            NSLog(@"TAAE: Input status updated: No input avaliable");
+            TAAELog(@"Input status updated: No input avaliable");
         }
     }
     
@@ -3166,7 +3166,7 @@ static void removeChannelsFromGroup(AEAudioController_iOS5 *THIS, AEChannelGroup
 - (BOOL)attemptRecoveryFromSystemError:(NSError**)error {
     int retries = 3;
     while ( retries > 0 ) {
-        NSLog(@"TAAE: Trying to recover from system error (%d retries remain)", retries);
+        TAAELog(@"Trying to recover from system error (%d retries remain)", retries);
         retries--;
         
         [self stop];
@@ -3178,13 +3178,13 @@ static void removeChannelsFromGroup(AEAudioController_iOS5 *THIS, AEChannelGroup
         
         if ( [self setup] && [self start:error recoveringFromErrors:NO] ) {
             [[NSNotificationCenter defaultCenter] postNotificationName:AEAudioController_iOS5DidRecreateGraphNotification object:self];
-            NSLog(@"TAAE: Successfully recovered from system error");
+            TAAELog(@"Successfully recovered from system error");
             _hasSystemError = NO;
             return YES;
         }
     }
     
-    NSLog(@"TAAE: Could not recover from system error.");
+    TAAELog(@"Could not recover from system error.");
     if ( error ) *error = self.lastError;
     _hasSystemError = YES;
     return NO;

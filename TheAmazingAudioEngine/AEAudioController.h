@@ -30,6 +30,12 @@ extern "C" {
 #import <AudioToolbox/AudioToolbox.h>
 #import <AudioUnit/AudioUnit.h>
 
+#if defined DEBUG
+#define TAAELog(format, ...) NSLog((@"TAAE: " format), ##__VA_ARGS__)
+#else
+#define TAAELog(format, ...) do { } while (0)
+#endif
+
 @class AEAudioController_iOS5;
 
 #pragma mark - Notifications and constants
