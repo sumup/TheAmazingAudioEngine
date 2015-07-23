@@ -75,7 +75,7 @@ const NSString *kAEAudioControllerUserInfoKey = @"userinfo";
 static inline int min(int a, int b) { return a>b ? b : a; }
 
 static inline void AEAudioControllerError(OSStatus result, const char *operation, const char* file, int line) {
-    int fourCC = CFSwapInt32HostToBig(result);
+    __unused int fourCC = CFSwapInt32HostToBig(result);
     @autoreleasepool {
         TAAELog(@"%s:%d: %s result %d %08X %4.4s\n", file, line, operation, (int)result, (int)result, (char*)&fourCC);
     }
