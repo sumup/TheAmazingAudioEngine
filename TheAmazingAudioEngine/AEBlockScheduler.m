@@ -146,9 +146,9 @@ struct _schedule_t {
     [_audioController performSynchronousMessageExchangeWithBlock:^{
         for ( int i=0; i<scheduleCount; i++ ) {
             memset(pointers_array[i], 0, sizeof(struct _schedule_t));
-            if ( (pointers_array[i] - _schedule) == _tail ) {
-                while ( !_schedule[_tail].block && _tail != _head ) {
-                    _tail = (_tail + 1) % kMaximumSchedules;
+            if ( (pointers_array[i] - self->_schedule) == self->_tail ) {
+                while ( !self->_schedule[self->_tail].block && self->_tail != self->_head ) {
+                    self->_tail = (self->_tail + 1) % kMaximumSchedules;
                 }
             }
         }
@@ -192,7 +192,7 @@ static void timingReceiverFinishSchedule(void *userInfo, int len) {
     __unsafe_unretained AEBlockScheduler *THIS = (__bridge AEBlockScheduler*)arg->THIS;
     
     if ( arg->schedule.responseBlock ) {
-        ((__bridge_transfer void(^)())arg->schedule.responseBlock)();
+        ((__bridge_transfer void(^)(void))arg->schedule.responseBlock)();
     }
     CFBridgingRelease(arg->schedule.block);
     
