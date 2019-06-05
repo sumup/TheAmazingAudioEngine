@@ -2407,7 +2407,7 @@ AudioTimeStamp AEAudioControllerCurrentAudioTimestamp(__unsafe_unretained AEAudi
 
             UInt32 iaaConnected;
             UInt32 size = sizeof(iaaConnected);
-            AudioUnitGetProperty(self->_ioAudioUnit, kAudioUnitProperty_IsInterAppConnected, kAudioUnitScope_Global, 0, &iaaConnected, &size);
+            AudioUnitGetProperty(self->_ioAudioUnit, kAudioUnitProperty_MakeConnection, kAudioUnitScope_Global, 0, &iaaConnected, &size);
             if ( iaaConnected ) {
                 TAAELog(@"Audio session interrupted while connected to IAA, restarting");
                 [self start:NULL];
@@ -2509,7 +2509,7 @@ static void interAppConnectedChangeCallback(void *inRefCon, AudioUnit inUnit, Au
         
         UInt32 iaaConnected;
         UInt32 size = sizeof(iaaConnected);
-        AudioUnitGetProperty(THIS->_ioAudioUnit, kAudioUnitProperty_IsInterAppConnected, kAudioUnitScope_Global, 0, &iaaConnected, &size);
+        AudioUnitGetProperty(THIS->_ioAudioUnit, kAudioUnitProperty_MakeConnection, kAudioUnitScope_Global, 0, &iaaConnected, &size);
         
         if ( !iaaConnected ) {
             if ( [[UIApplication sharedApplication] applicationState] == UIApplicationStateBackground ) {
@@ -2938,7 +2938,7 @@ static void audioUnitStreamFormatChanged(void *inRefCon, AudioUnit inUnit, Audio
 #endif
     
 #if TARGET_OS_IPHONE
-    AECheckOSStatus(AudioUnitAddPropertyListener(_ioAudioUnit, kAudioUnitProperty_IsInterAppConnected, interAppConnectedChangeCallback, (__bridge void*)self),
+    AECheckOSStatus(AudioUnitAddPropertyListener(_ioAudioUnit, kAudioUnitProperty_MakeConnection, interAppConnectedChangeCallback, (__bridge void*)self),
                 "AudioUnitAddPropertyListener(kAudioUnitProperty_IsInterAppConnected)");
 #endif
 }
@@ -3069,7 +3069,7 @@ static void audioUnitStreamFormatChanged(void *inRefCon, AudioUnit inUnit, Audio
     // When connected to IAA, use the stream format
     UInt32 iaaConnected;
     UInt32 size = sizeof(iaaConnected);
-    if ( AECheckOSStatus(AudioUnitGetProperty(_ioAudioUnit, kAudioUnitProperty_IsInterAppConnected, kAudioUnitScope_Global, 0, &iaaConnected, &size), "AudioUnitGetProperty(kAudioUnitProperty_IsInterAppConnected)") && iaaConnected ) {
+    if ( AECheckOSStatus(AudioUnitGetProperty(_ioAudioUnit, kAudioUnitProperty_MakeConnection, kAudioUnitScope_Global, 0, &iaaConnected, &size), "AudioUnitGetProperty(kAudioUnitProperty_IsInterAppConnected)") && iaaConnected ) {
         AudioStreamBasicDescription inputDescription;
         UInt32 size = sizeof(inputDescription);
         if ( AECheckOSStatus(AudioUnitGetProperty(_ioAudioUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 1, &inputDescription, &size), "AudioUnitGetProperty(inputUnit, kAudioUnitProperty_StreamFormat") ) {
