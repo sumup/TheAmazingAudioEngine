@@ -829,6 +829,8 @@ static OSStatus ioUnitRenderNotifyCallback(void *inRefCon, AudioUnitRenderAction
                                             | (useVoiceProcessing ? AEAudioControllerOptionUseVoiceProcessing : 0)];
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wbitwise-conditional-parentheses"
 - (id)initWithAudioDescription:(AudioStreamBasicDescription)audioDescription inputEnabled:(BOOL)enableInput useVoiceProcessing:(BOOL)useVoiceProcessing outputEnabled:(BOOL)enableOutput {
     return [self initWithAudioDescription:audioDescription options:
         enableInput?           AEAudioControllerOptionEnableInput:0|
@@ -837,6 +839,7 @@ static OSStatus ioUnitRenderNotifyCallback(void *inRefCon, AudioUnitRenderAction
         enableOutput?          AEAudioControllerOptionAllowMixingWithOtherApps:0
     ];
 }
+#pragma GCC diagnostic pop
 
 - (id)initWithAudioDescription:(AudioStreamBasicDescription)audioDescription options:(AEAudioControllerOptions)options {
     if ( !(self = [super init]) ) return nil;
