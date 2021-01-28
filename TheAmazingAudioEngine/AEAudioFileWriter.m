@@ -101,6 +101,8 @@ NSString * const AEAudioFileWriterErrorDomain = @"com.theamazingaudioengine.AEAu
     return [self beginWritingToFileAtPath:path fileType:fileType bitDepth:bits channels:0 error:error];
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
 - (BOOL)beginWritingToFileAtPath:(NSString*)path fileType:(AudioFileTypeID)fileType bitDepth:(UInt32)bits channels:(UInt32)channels error:(NSError**)error
 {
 
@@ -209,6 +211,7 @@ NSString * const AEAudioFileWriterErrorDomain = @"com.theamazingaudioengine.AEAu
     
     return YES;
 }
+#pragma GCC diagnostic pop
 
 - (void)finishWriting {
     if ( !_writing ) return;

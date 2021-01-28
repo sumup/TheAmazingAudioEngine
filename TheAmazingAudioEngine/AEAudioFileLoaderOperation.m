@@ -94,6 +94,8 @@ static const int kMaxAudioFileReadSize = 16384;
 }
 
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
 -(void)main {
     ExtAudioFileRef audioFile;
     OSStatus status;
@@ -239,5 +241,6 @@ static const int kMaxAudioFileReadSize = 16384;
         _completedBlock();
     }
 }
+#pragma GCC diagnostic pop
 
 @end
